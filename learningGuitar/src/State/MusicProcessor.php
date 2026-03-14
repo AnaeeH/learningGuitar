@@ -39,7 +39,6 @@ class MusicProcessor implements ProcessorInterface
         if ($xmlFile !== null) {
             $originalName = $xmlFile->getClientOriginalName();
             $xmlFile->move($xmlDir, $originalName);
-            $music->setXmlPath($originalName);
             $this->parseXML($xmlDir . '/' . $originalName, $music);
         }
         if ($audioFile !== null) {
@@ -50,6 +49,12 @@ class MusicProcessor implements ProcessorInterface
 
         $this->em->persist($music);
         $this->em->flush();
+
+        if ($xmlFile !== null) {
+            $oldPath = $xmlDir . '/' . $xmlFile->getClientOriginalName();
+            $music->setXmlFileName(str_replace(' ', '', $music->getTitle()) . $music->getId() . '.musicxml');
+            rename($oldPath, $xmlDir . '/' . $music->getXmlFileName());
+        }
 
         return $music;
     }

@@ -85,12 +85,10 @@ class Music
     #[Groups(['music:comment', 'music:read'])]
     private ?string $comment = null;
 
-    #[ORM\Column(length: 255, nullable: true, name: 'mus_xmlpath')]
-    #[Groups(['music:read'])]
-    private ?string $xmlPath = null;
+    private ?string $xmlFileName = null;
 
-    #[Vich\UploadableField(mapping: 'music_xml', fileNameProperty: 'xmlPath')]
-    #[Groups(['music:write', 'music:read'])]
+    #[Vich\UploadableField(mapping: 'music_xml', fileNameProperty: 'xmlFileName')]
+    #[Groups(['music:write'])]
     public ?File $xmlFile = null;
 
     #[ORM\Column(length: 255, nullable: true, name: 'mus_audiopath')]
@@ -98,7 +96,7 @@ class Music
     private ?string $audioPath = null;
 
     #[Vich\UploadableField(mapping: 'music_audio', fileNameProperty: 'audioPath')]
-    #[Groups(['music:write', 'music:read'])]
+    #[Groups(['music:write'])]
     public ?File $audioFile = null;
 
     /**
@@ -172,15 +170,14 @@ class Music
         return $this;
     }
 
-    public function getXmlPath(): ?string
+    public function getXmlFileName(): ?string
     {
-        return $this->xmlPath;
+        return $this->xmlFileName;
     }
 
-    public function setXmlPath(?string $xmlPath): static
+    public function setXmlFileName(?string $xmlFileName): static
     {
-        $this->xmlPath = $xmlPath;
-
+        $this->xmlFileName = $xmlFileName;
         return $this;
     }
 

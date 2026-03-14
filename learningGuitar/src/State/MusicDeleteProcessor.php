@@ -28,7 +28,8 @@ class MusicDeleteProcessor implements ProcessorInterface
         }
 
         $this->deleteFile('music_audio_directory', $data->getAudioPath());
-        $this->deleteFile('music_xml_directory', $data->getXmlPath());
+        $xmlFileName = str_replace(' ', '', $data->getTitle()) . $data->getId() . '.musicxml';
+        $this->deleteFile('music_xml_directory', $xmlFileName);
 
         $this->em->remove($data);
         $this->em->flush();
