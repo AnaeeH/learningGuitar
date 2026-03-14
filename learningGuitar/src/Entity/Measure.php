@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Beat;
 use App\Repository\MeasureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -36,7 +37,12 @@ class Measure
     /**
      * @var Collection<int, Beat>
      */
-    #[ORM\OneToMany(targetEntity: Beat::class, mappedBy: 'measure')]
+    #[ORM\OneToMany(
+        targetEntity: Beat::class,
+        mappedBy: 'measure',
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
     #[Groups(['music:read'])]
     private Collection $beats;
 

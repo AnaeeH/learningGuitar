@@ -9,11 +9,13 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
 use App\State\MusicProcessor;
+use App\State\MusicDeleteProcessor;
 use Vich\UploaderBundle\Mapping\Attribute as Vich;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\HttpFoundation\File\File;
@@ -41,11 +43,15 @@ use Symfony\Component\HttpFoundation\File\File;
         new Patch(
             uriTemplate: '/music/{id}/comment',
             denormalizationContext: ['groups' => ['music:comment']]
+        ),
+        new Delete(
+            uriTemplate: '/music/{id}/delete',
+            processor: MusicDeleteProcessor::class,
         )
     ]
 )]
 #[ORM\Entity(repositoryClass: MusicRepository::class)]
-#[Vich\Uploadable] 
+#[Vich\Uploadable]
 #[ORM\Table(name: 't_music_mus')]
 class Music
 {
@@ -76,7 +82,7 @@ class Music
     private bool $favorite = false;
 
     #[ORM\Column(length: 255, nullable: true, name: 'mus_comment')]
-    #[Groups(['music:comment', 'music:read'])] 
+    #[Groups(['music:comment', 'music:read'])]
     private ?string $comment = null;
 
     #[ORM\Column(length: 255, nullable: true, name: 'mus_xmlpath')]
@@ -84,7 +90,7 @@ class Music
     private ?string $xmlPath = null;
 
     #[Vich\UploadableField(mapping: 'music_xml', fileNameProperty: 'xmlPath')]
-    #[Groups(['music:write', 'music:read'])] 
+    #[Groups(['music:write', 'music:read'])]
     public ?File $xmlFile = null;
 
     #[ORM\Column(length: 255, nullable: true, name: 'mus_audiopath')]
@@ -92,13 +98,18 @@ class Music
     private ?string $audioPath = null;
 
     #[Vich\UploadableField(mapping: 'music_audio', fileNameProperty: 'audioPath')]
-    #[Groups(['music:write', 'music:read'])] 
+    #[Groups(['music:write', 'music:read'])]
     public ?File $audioFile = null;
 
     /**
      * @var Collection<int, Measure>
      */
-    #[ORM\OneToMany(targetEntity: Measure::class, mappedBy: 'music')]
+    #[ORM\OneToMany(
+        targetEntity: Measure::class,
+        mappedBy: 'music',
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
     #[Groups(['music:read'])]
     private Collection $measures;
 

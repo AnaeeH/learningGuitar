@@ -31,8 +31,8 @@ class MusicProcessor implements ProcessorInterface
 
         $music = new Music();
 
-        $xmlDir = $this->params->get('kernel.project_dir') . '/public/files/xml';
-        $audioDir = $this->params->get('kernel.project_dir') . '/public/files/audio';
+        $xmlDir = $this->params->get('music_xml_directory');
+        $audioDir = $this->params->get('music_audio_directory');
         $xmlFile = $request->files->get('xmlFile');
         $audioFile = $request->files->get('audioFile');
 
