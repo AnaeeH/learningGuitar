@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MusicRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
@@ -21,6 +23,7 @@ use Symfony\Component\HttpFoundation\File\File;
 ])]
 #[ApiResource(
     paginationEnabled: false,
+    normalizationContext: ['groups' => ['music:read']],
     operations: [
         new GetCollection(uriTemplate: '/musics'),
         new Get(uriTemplate: '/music/{id}'),
@@ -49,41 +52,60 @@ class Music
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'mus_id')]
+    #[Groups(['music:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 150, nullable: true, name: 'mus_title')]
+    #[Groups(['music:read'])]
     private ?string $title = null;
 
     #[ORM\Column(nullable: true, name: 'mus_tempo')]
+    #[Groups(['music:read'])]
     private ?int $tempo = null;
 
     #[ORM\Column(length: 8, nullable: true, name: 'mus_time_signature')]
+    #[Groups(['music:read'])]
     private ?string $time_signature = null;
 
     #[ORM\Column(length: 16, nullable: true, name: 'mus_key_signature')]
+    #[Groups(['music:read'])]
     private ?string $key_signature = null;
 
     #[ORM\Column(name: 'mus_favorite')]
-    #[Groups(['music:favorite'])]
+    #[Groups(['music:favorite', 'music:read'])]
     private bool $favorite = false;
 
     #[ORM\Column(length: 255, nullable: true, name: 'mus_comment')]
-    #[Groups(['music:comment'])] 
+    #[Groups(['music:comment', 'music:read'])] 
     private ?string $comment = null;
 
     #[ORM\Column(length: 255, nullable: true, name: 'mus_xmlpath')]
+    #[Groups(['music:read'])]
     private ?string $xmlPath = null;
 
     #[Vich\UploadableField(mapping: 'music_xml', fileNameProperty: 'xmlPath')]
-    #[Groups(['music:write'])] 
+    #[Groups(['music:write', 'music:read'])] 
     public ?File $xmlFile = null;
 
     #[ORM\Column(length: 255, nullable: true, name: 'mus_audiopath')]
+    #[Groups(['music:read'])]
     private ?string $audioPath = null;
 
     #[Vich\UploadableField(mapping: 'music_audio', fileNameProperty: 'audioPath')]
-    #[Groups(['music:write'])] 
+    #[Groups(['music:write', 'music:read'])] 
     public ?File $audioFile = null;
+
+    /**
+     * @var Collection<int, Measure>
+     */
+    #[ORM\OneToMany(targetEntity: Measure::class, mappedBy: 'music')]
+    #[Groups(['music:read'])]
+    private Collection $measures;
+
+    public function __construct()
+    {
+        $this->measures = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -183,6 +205,36 @@ class Music
     public function setComment(?string $comment): static
     {
         $this->comment = $comment;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Measure>
+     */
+    public function getMeasures(): Collection
+    {
+        return $this->measures;
+    }
+
+    public function addMeasure(Measure $measure): static
+    {
+        if (!$this->measures->contains($measure)) {
+            $this->measures->add($measure);
+            $measure->setMusic($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMeasure(Measure $measure): static
+    {
+        if ($this->measures->removeElement($measure)) {
+            // set the owning side to null (unless already changed)
+            if ($measure->getMusic() === $this) {
+                $measure->setMusic(null);
+            }
+        }
 
         return $this;
     }

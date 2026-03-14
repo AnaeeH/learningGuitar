@@ -4,6 +4,8 @@ namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\Entity\Beat;
+use App\Entity\Measure;
 use App\Entity\Music;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -76,6 +78,67 @@ class MusicProcessor implements ProcessorInterface
         $mode = (string) $xml->part->measure->attributes->key->mode;
         if (!empty($mode)) {
             $music->setKeySignature($fifths . ' ' . $mode);
+        }
+
+        $this->parseXMLMeasures($xml, $music);
+    }
+
+    private function parseXMLMeasures(\SimpleXMLElement $xml, Music $music): void
+    {
+        foreach ($xml->part->measure as $measureNode) {
+            $measure = new Measure();
+            $measure->setNumero((int) $measureNode['number']);
+            $measure->setMusic($music);
+
+            $measureTempo = (int) $measureNode->direction->sound['tempo'];
+            if ($measureTempo > 0 && $measureTempo !== $music->getTempo()) {
+                $measure->setTempo($measureTempo);
+            }
+
+            $measureBeats = (string) $measureNode->attributes->time->beats;
+            $measureBeatType = (string) $measureNode->attributes->time->{'beat-type'};
+            if (!empty($measureBeats) && !empty($measureBeatType)) {
+                $sig = $measureBeats . '/' . $measureBeatType;
+                if ($sig !== $music->getTimeSignature()) {
+                    $measure->setTimeSignature($sig);
+                }
+            }
+
+            $this->em->persist($measure);
+
+            $staves = (int) $measureNode->attributes->staves;
+            $this->parseXMLNotes($measureNode, $measure, $staves);
+        }
+    }
+
+    private function parseXMLNotes(mixed $measureNode, Measure $measure, int $staves): void
+    {
+        foreach ($measureNode->note as $noteNode) {
+            if ($staves === 2 && (int) $noteNode->staff === 1) {
+                continue;
+            }
+
+            $beat = new Beat();
+            $beat->setMeasure($measure);
+
+            if (!isset($noteNode->rest)) {
+                $beat->setPitchStep((string) $noteNode->pitch->step);
+                $beat->setPitchOctave((int) $noteNode->pitch->octave);
+
+                if (isset($noteNode->pitch->alter)) {
+                    $beat->setPitchAlter((float) $noteNode->pitch->alter);
+                }
+
+                if (isset($noteNode->notations->technical->string)) {
+                    $beat->setString((int) $noteNode->notations->technical->string);
+                    $beat->setFret((int) $noteNode->notations->technical->fret);
+                }
+            }
+            $beat->setDuration((int) $noteNode->duration);
+            $beat->setType((string) $noteNode->type);
+            $beat->setDot(isset($noteNode->dot));
+
+            $this->em->persist($beat);
         }
     }
 }
