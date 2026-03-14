@@ -22,15 +22,14 @@ use ApiPlatform\Metadata\ApiFilter;
     paginationEnabled: false,
     operations: [
         new GetCollection(uriTemplate: '/chords'),
-        new Get(uriTemplate: '/chords/{id}'),
-        new Post(uriTemplate: '/chords'),
-        new Patch(uriTemplate: '/chords/{id}'),
-        new Delete(uriTemplate: '/chords/{id}'),
+        new Get(uriTemplate: '/chord/{id}'),
+        new Post(uriTemplate: '/chord'),
+        new Patch(uriTemplate: '/chord/patch/{id}'),
+        new Delete(uriTemplate: '/chord/delete/{id}'),
     ]
 )]
 #[ORM\Entity(repositoryClass: ChordRepository::class)]
 #[ORM\Table(name: 't_chord_chr')]
-
 class Chord
 {
     #[ORM\Id]
