@@ -16,11 +16,11 @@ class Video
     private ?int $id = null;
 
     #[ORM\Column(length: 20, name: 'vdo_video_id')]
-    #[Groups(['music:read', 'music:write'])]
+    #[Groups(['music:detail', 'music:write'])]
     private ?string $videoId = null;
 
     #[ORM\Column(name: 'vdo_start_sec')]
-    #[Groups(['music:read', 'music:write'])]
+    #[Groups(['music:detail', 'music:write'])]
     private ?float $startSec = null;
 
     #[ORM\OneToOne(inversedBy: 'video')]

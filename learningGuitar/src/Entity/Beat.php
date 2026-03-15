@@ -8,6 +8,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BeatRepository::class)]
 #[ORM\Table(name: 't_beat_bea')]
+#[ORM\Index(columns: ['bea_mea_id'], name: 'idx_beat_measure')]
 class Beat
 {
     #[ORM\Id]
@@ -16,35 +17,35 @@ class Beat
     private ?int $id = null;
 
     #[ORM\Column(length: 2, nullable: true, name: 'bea_pitch_step')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?string $pitchStep = null;
 
     #[ORM\Column(nullable: true, name: 'bea_pitch_octave')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?int $pitchOctave = null;
 
     #[ORM\Column(nullable: true, name: 'bea_pitch_alter')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?float $pitchAlter = null;
 
     #[ORM\Column(name: 'bea_duration')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?int $duration;
 
     #[ORM\Column(length: 16, name: 'bea_type')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?string $type;
 
     #[ORM\Column(name: 'bea_dot')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?bool $dot = false;
 
     #[ORM\Column(nullable: true, name: 'bea_string')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?int $string = null;
 
     #[ORM\Column(nullable: true, name: 'bea_fret')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?int $fret = null;
 
     #[ORM\ManyToOne(inversedBy: 'beats')]

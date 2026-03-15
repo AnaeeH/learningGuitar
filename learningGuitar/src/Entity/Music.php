@@ -24,10 +24,14 @@ use Symfony\Component\HttpFoundation\File\File;
     'title'    => 'ipartial', // /api/musics?title=SanFran
 ])]
 #[ApiResource(
-    paginationEnabled: false,
-    normalizationContext: ['groups' => ['music:read']],
+    paginationEnabled: true,
+    paginationItemsPerPage: 20,
+    normalizationContext: ['groups' => ['music:detail']],
     operations: [
-        new GetCollection(uriTemplate: '/musics'),
+        new GetCollection(
+            uriTemplate: '/musics',
+            normalizationContext: ['groups' => ['music:read']]
+        ),
         new Get(uriTemplate: '/music/{id}'),
         new Post(
             uriTemplate: '/music',
@@ -38,11 +42,13 @@ use Symfony\Component\HttpFoundation\File\File;
         ),
         new Patch(
             uriTemplate: '/music/{id}/favorite',
-            denormalizationContext: ['groups' => ['music:favorite']]
+            denormalizationContext: ['groups' => ['music:favorite']],
+            normalizationContext: ['groups' => ['music:read']]
         ),
         new Patch(
             uriTemplate: '/music/{id}/comment',
-            denormalizationContext: ['groups' => ['music:comment']]
+            denormalizationContext: ['groups' => ['music:comment']],
+            normalizationContext: ['groups' => ['music:read']]
         ),
         new Delete(
             uriTemplate: '/music/{id}/delete',
@@ -58,31 +64,31 @@ class Music
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'mus_id')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:read', 'music:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 150, nullable: true, name: 'mus_title')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:read', 'music:detail'])]
     private ?string $title = null;
 
     #[ORM\Column(nullable: true, name: 'mus_tempo')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?int $tempo = null;
 
     #[ORM\Column(length: 8, nullable: true, name: 'mus_time_signature')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?string $time_signature = null;
 
     #[ORM\Column(length: 16, nullable: true, name: 'mus_key_signature')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?string $key_signature = null;
 
     #[ORM\Column(name: 'mus_favorite')]
-    #[Groups(['music:favorite', 'music:read'])]
+    #[Groups(['music:read', 'music:favorite', 'music:detail'])]
     private bool $favorite = false;
 
     #[ORM\Column(length: 255, nullable: true, name: 'mus_comment')]
-    #[Groups(['music:comment', 'music:read'])]
+    #[Groups(['music:read', 'music:comment', 'music:detail'])]
     private ?string $comment = null;
 
     private ?string $xmlFileName = null;
@@ -92,7 +98,7 @@ class Music
     public ?File $xmlFile = null;
 
     #[ORM\Column(length: 255, nullable: true, name: 'mus_audiopath')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?string $audioPath = null;
 
     #[Vich\UploadableField(mapping: 'music_audio', fileNameProperty: 'audioPath')]
@@ -108,11 +114,11 @@ class Music
         cascade: ['remove'],
         orphanRemoval: true
     )]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private Collection $measures;
 
     #[ORM\OneToOne(mappedBy: 'music', cascade: ['persist', 'remove'])]
-    #[Groups(['music:read', 'music:write'])]
+    #[Groups(['music:detail', 'music:write'])]
     private ?Video $video = null;
 
     public function __construct()

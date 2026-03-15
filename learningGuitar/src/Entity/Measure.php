@@ -11,6 +11,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MeasureRepository::class)]
 #[ORM\Table(name: 't_measure_mea')]
+#[ORM\Index(columns: ['mea_mus_id'], name: 'idx_measure_music')]
 class Measure
 {
     #[ORM\Id]
@@ -19,15 +20,15 @@ class Measure
     private ?int $id = null;
 
     #[ORM\Column(name: 'mea_numero')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?int $numero = null;
 
     #[ORM\Column(nullable: true, name: 'mea_tempo')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?int $tempo = null;
 
     #[ORM\Column(length: 32, nullable: true, name: 'mea_time_signature')]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private ?string $timeSignature = null;
 
     #[ORM\ManyToOne(inversedBy: 'measures')]
@@ -43,7 +44,7 @@ class Measure
         cascade: ['remove'],
         orphanRemoval: true
     )]
-    #[Groups(['music:read'])]
+    #[Groups(['music:detail'])]
     private Collection $beats;
 
     public function __construct()
