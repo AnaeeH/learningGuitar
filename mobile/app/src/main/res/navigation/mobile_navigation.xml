@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_musics">
+
+    <fragment
+        android:id="@+id/nav_chords"
+        android:name="com.herbillon.guitar.ui.chords.ChordsFragment"
+        android:label="Chords"
+        tools:layout="@layout/fragment_chords" />
+
+    <fragment
+        android:id="@+id/nav_musics"
+        android:name="com.herbillon.guitar.ui.musics.MusicsFragment"
+        android:label="Musics"
+        tools:layout="@layout/fragment_musics" />
+
+    <fragment
+        android:id="@+id/nav_music"
+        android:name="com.herbillon.guitar.ui.music.MusicFragment"
+        android:label="Music"
+        tools:layout="@layout/fragment_music" />
+
+    <fragment
+        android:id="@+id/nav_player"
+        android:name="com.herbillon.guitar.ui.player.PlayerFragment"
+        android:label="Player"
+        tools:layout="@layout/fragment_player" />
+
+</navigation>
