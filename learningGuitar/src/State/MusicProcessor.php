@@ -7,6 +7,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Beat;
 use App\Entity\Measure;
 use App\Entity\Music;
+use App\Entity\Video;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -30,6 +31,8 @@ class MusicProcessor implements ProcessorInterface
         $request = $this->requestStack->getCurrentRequest();
 
         $music = new Music();
+
+        $this->processVideo($request, $music);
 
         $xmlDir = $this->params->get('music_xml_directory');
         $audioDir = $this->params->get('music_audio_directory');
@@ -57,6 +60,26 @@ class MusicProcessor implements ProcessorInterface
         }
 
         return $music;
+    }
+
+    private function processVideo($request, Music $music): void
+    {
+        $videoRaw = $request->request->get('video');
+
+        if ($videoRaw !== null) {
+            $videoData = json_decode($videoRaw, true);
+            $videoId = $videoData['videoId'] ?? null;
+            $startSec = $videoData['startSec'] ?? 0;
+
+            if ($videoId !== null && $startSec !== null) {
+                $video = new Video();
+                $video->setVideoId($videoId);
+                $video->setStartSec((float) $startSec);
+                $video->setMusic($music);
+                $this->em->persist($video);
+                $music->setVideo($video);
+            }
+        }
     }
 
     private function parseXML(string $path, Music $music): void

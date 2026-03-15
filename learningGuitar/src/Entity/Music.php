@@ -111,6 +111,10 @@ class Music
     #[Groups(['music:read'])]
     private Collection $measures;
 
+    #[ORM\OneToOne(mappedBy: 'music', cascade: ['persist', 'remove'])]
+    #[Groups(['music:read', 'music:write'])]
+    private ?Video $video = null;
+
     public function __construct()
     {
         $this->measures = new ArrayCollection();
@@ -243,6 +247,18 @@ class Music
                 $measure->setMusic(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getVideo(): ?Video
+    {
+        return $this->video;
+    }
+
+    public function setVideo(?Video $video): static
+    {
+        $this->video = $video;
 
         return $this;
     }
