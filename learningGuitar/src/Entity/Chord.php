@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiFilter(SearchFilter::class, properties: [
     'note'    => 'exact',   // /api/chords?note=/api/notes/1
@@ -20,6 +21,7 @@ use ApiPlatform\Metadata\ApiFilter;
 ])]
 #[ApiResource(
     paginationEnabled: false,
+    normalizationContext: ['groups' => ['chord:detail']],
     operations: [
         new GetCollection(uriTemplate: '/chords'),
         new Get(uriTemplate: '/chord/{id}'),
@@ -35,19 +37,24 @@ class Chord
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'chr_id')]
+    #[Groups(['chord:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 32, name: 'chr_name')]
+    #[Groups(['chord:detail'])]
     private ?string $name = null;
 
     #[ORM\Column(type: 'text', name: 'chr_diagram')]
+    #[Groups(['chord:detail'])]
     private ?string $diagram = null;
 
     #[ORM\Column(type: "boolean", name: 'chr_ismajor', options: ["default" => true])]
+    #[Groups(['chord:detail'])]
     private bool $isMajor = true;
 
     #[ORM\ManyToOne(inversedBy: 'chords')]
     #[ORM\JoinColumn(nullable: false, name: 'chr_nte_id', referencedColumnName: 'nte_id')]
+    #[Groups(['chord:detail'])]
     private ?Note $note = null;
 
     public function getId(): ?int

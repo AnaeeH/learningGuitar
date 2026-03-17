@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     paginationEnabled: false,
@@ -30,6 +31,7 @@ class Note
     private ?string $name = null;
 
     #[ORM\Column(length: 64, name: 'nte_label')]
+    #[Groups(['chord:detail'])]
     private ?string $label = null;
 
     #[ORM\OneToMany(targetEntity: Chord::class, mappedBy: 'note')]
