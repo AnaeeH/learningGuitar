@@ -80,8 +80,12 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
-    public void fetchMusics() {
+    public void fetchMusics(boolean favorite) {
         String url = API_BASE_URL + "/musics";
+
+        if (favorite){
+            url += "?favorite=true";
+        }
 
         Log.d("GuitarAPI","fetching musics");
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,

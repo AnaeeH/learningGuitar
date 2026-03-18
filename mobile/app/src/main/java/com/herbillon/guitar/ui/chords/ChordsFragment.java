@@ -67,10 +67,8 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
         } else {
             List<Chord> filtered = new ArrayList<>();
             for (Chord chord : allChords) {
-                if (chord.getName().toLowerCase().startsWith(query.toLowerCase())) {
-                    filtered.add(chord);
-                }
-                if (chord.getLabel().toLowerCase().startsWith(query.toLowerCase())) {
+                if (chord.getName().toLowerCase().startsWith(query.toLowerCase()) ||
+                        chord.getLabel().toLowerCase().startsWith(query.toLowerCase())) {
                     filtered.add(chord);
                 }
             }
@@ -81,7 +79,6 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
     private List<Chord> processDatas() {
         JSONArray datas = GuitarAPI.dataChords;
         List<Chord> chords = new ArrayList<>();
-        Log.d("ChordsFragment", "datas : " + datas);
         try {
             for (int i = 0; i < datas.length(); i++) {
                 JSONObject chord = datas.getJSONObject(i);
@@ -115,11 +112,7 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
     @Override
     public void onChanged(Object o) {
         String query = binding.searchInput.getText().toString();
-        if (!query.isEmpty()) {
-            filterChords(query);
-        } else {
-            refreshUI(processDatas());
-        }
+        filterChords(query);
     }
 
     @Override

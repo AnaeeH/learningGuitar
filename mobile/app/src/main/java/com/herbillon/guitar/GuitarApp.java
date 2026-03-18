@@ -13,6 +13,6 @@ public class GuitarApp extends Application {
         guitarAPI = new GuitarAPI();
         guitarAPI.start(this);
         guitarAPI.fetchChords("");
-        guitarAPI.fetchMusics();
+        guitarAPI.fetchMusics(false);
     }
 }

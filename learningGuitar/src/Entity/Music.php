@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\File\File;
 
 #[ApiFilter(SearchFilter::class, properties: [
     'title'    => 'ipartial', // /api/musics?title=SanFran
+    'favorite' => 'exact'
 ])]
 #[ApiResource(
     paginationEnabled: true,
