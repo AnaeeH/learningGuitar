@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -16,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.herbillon.guitar.GuitarApp;
+import com.herbillon.guitar.Refreshable;
 import com.herbillon.guitar.databinding.FragmentChordsBinding;
 import com.herbillon.guitar.model.Chord;
 import com.herbillon.guitar.network.GuitarAPI;
@@ -27,16 +27,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChordsFragment extends Fragment implements Observer {
+public class ChordsFragment extends Fragment implements Observer, Refreshable {
     private FragmentChordsBinding binding;
     private GuitarAPI guitarAPI;
-    private final Handler handler = new Handler();
-    private Runnable updateRunnable;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentChordsBinding.inflate(inflater, container, false);
-
         View view = binding.getRoot();
 
         GuitarApp app = (GuitarApp) requireActivity().getApplication();
@@ -45,17 +42,7 @@ public class ChordsFragment extends Fragment implements Observer {
         binding.recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
         binding.chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            if (checkedIds.isEmpty()) return;
-
-            int selectedId = checkedIds.get(0);
-
-            if (selectedId == binding.chipMajor.getId()) {
-                guitarAPI.fetchChords("major");
-            } else if (selectedId == binding.chipMinor.getId()) {
-                guitarAPI.fetchChords("minor");
-            } else {
-                guitarAPI.fetchChords("");
-            }
+            onRefresh();
         });
 
         binding.searchInput.addTextChangedListener(new TextWatcher() {
@@ -119,33 +106,6 @@ public class ChordsFragment extends Fragment implements Observer {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        updateRunnable = new Runnable() {
-            @Override
-            public void run() {
-                int selectedId = binding.chipGroup.getCheckedChipId();
-                if (selectedId == binding.chipMajor.getId()) {
-                    guitarAPI.fetchChords("major");
-                } else if (selectedId == binding.chipMinor.getId()) {
-                    guitarAPI.fetchChords("minor");
-                } else {
-                    guitarAPI.fetchChords("");
-                }
-
-                handler.postDelayed(this, 30000);
-            }
-        };
-        handler.post(updateRunnable);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        handler.removeCallbacks(updateRunnable);
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         guitarAPI.removeObserver(this);
@@ -160,5 +120,17 @@ public class ChordsFragment extends Fragment implements Observer {
         } else {
             refreshUI(processDatas());
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        int selectedId = binding.chipGroup.getCheckedChipId();
+        String filter = "";
+        if (selectedId == binding.chipMajor.getId()) {
+            filter = "major";
+        } else if (selectedId == binding.chipMinor.getId()) {
+            filter = "minor";
+        }
+        guitarAPI.fetchChords(filter);
     }
 }

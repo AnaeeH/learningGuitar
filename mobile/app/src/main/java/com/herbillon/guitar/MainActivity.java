@@ -21,10 +21,23 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = navHostFragment.getNavController();
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         NavigationUI.setupWithNavController(toolbar, navController);
+        toolbar.inflateMenu(R.menu.toolbar_menu);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_nav);
         NavigationUI.setupWithNavController(bottomNav, navController);
+
+        toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_refresh) {
+                androidx.fragment.app.Fragment currentFragment = navHostFragment.getChildFragmentManager()
+                        .getPrimaryNavigationFragment();
+
+                if (currentFragment instanceof Refreshable) {
+                    ((Refreshable) currentFragment).onRefresh();
+                }
+                return true;
+            }
+            return false;
+        });
     }
 }

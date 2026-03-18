@@ -64,8 +64,31 @@ public class GuitarAPI {
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,
                 url, null,
                 response -> {
-                    Log.d("ENode","datas received : " + response);
+                    Log.d("GuitarAPI","datas received : " + response);
                     dataChords = response;
+                    liveData.setValue(this);
+                }, error -> Log.e("GuitarAPI", error.toString())
+        ){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+                return headers;
+            }
+        };
+        requestQueue.add(request);
+    }
+
+    public void fetchMusics() {
+        String url = API_BASE_URL + "/musics";
+
+        Log.d("GuitarAPI","fetching musics");
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,
+                url, null,
+                response -> {
+                    Log.d("GuitarAPI","datas received : " + response);
+                    dataSongs = response;
                     liveData.setValue(this);
                 }, error -> Log.e("GuitarAPI", error.toString())
         ){
