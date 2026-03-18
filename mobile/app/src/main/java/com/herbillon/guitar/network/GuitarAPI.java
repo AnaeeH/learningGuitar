@@ -53,22 +53,22 @@ public class GuitarAPI {
     public void fetchChords(String filter) {
         String url = API_BASE_URL + "/chords";
 
-        if (filter.equals("major")){
+        if (filter.equals("major")) {
             url += "?isMajor=true";
         }
-        if (filter.equals("minor")){
+        if (filter.equals("minor")) {
             url += "?isMajor=false";
         }
 
-        Log.d("GuitarAPI","fetching chords");
+        Log.d("GuitarAPI", "fetching chords");
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,
                 url, null,
                 response -> {
-                    Log.d("GuitarAPI","datas received : " + response);
+                    Log.d("GuitarAPI", "datas received : " + response);
                     dataChords = response;
                     liveData.setValue(this);
                 }, error -> Log.e("GuitarAPI", error.toString())
-        ){
+        ) {
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<>();
@@ -83,19 +83,19 @@ public class GuitarAPI {
     public void fetchMusics(boolean favorite) {
         String url = API_BASE_URL + "/musics";
 
-        if (favorite){
+        if (favorite) {
             url += "?favorite=true";
         }
 
-        Log.d("GuitarAPI","fetching musics");
+        Log.d("GuitarAPI", "fetching musics");
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,
                 url, null,
                 response -> {
-                    Log.d("GuitarAPI","datas received : " + response);
+                    Log.d("GuitarAPI", "datas received : " + response);
                     dataSongs = response;
                     liveData.setValue(this);
                 }, error -> Log.e("GuitarAPI", error.toString())
-        ){
+        ) {
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<>();
@@ -104,6 +104,43 @@ public class GuitarAPI {
                 return headers;
             }
         };
+        requestQueue.add(request);
+    }
+
+    public void patchMusicFavorite(int id, boolean favorite, boolean inFavorite) {
+        String url = API_BASE_URL + "/music/" + id + "/favorite";
+
+        JSONObject body = new JSONObject();
+        try {
+            body.put("favorite", !favorite);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("GuitarAPI", "patching music " + url);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PATCH,
+                url, body,
+                response -> {
+                    Log.d("GuitarAPI", "datas received : " + response);
+                    fetchMusics(inFavorite);
+                    liveData.setValue(this);
+                }, error -> {
+            if (error.networkResponse != null) {
+                Log.e("GuitarAPI", "Status: " + error.networkResponse.statusCode);
+                Log.e("GuitarAPI", "Body: " + new String(error.networkResponse.data));
+            } else {
+                Log.e("GuitarAPI", error.toString());
+            }
+        }
+        ){
+            @Override
+            public Map<String, String> getHeaders () {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/merge-patch+json");
+                headers.put("Accept", "application/json");
+                return headers;
+            }
+        } ;
         requestQueue.add(request);
     }
 }

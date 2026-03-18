@@ -81,6 +81,9 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
 
     private List<Music> processDatas() {
         JSONArray datas = GuitarAPI.dataSongs;
+        if (datas == null){
+            return null;
+        }
         List<Music> musics = new ArrayList<>();
         try {
             for (int i = 0; i < datas.length(); i++) {
@@ -98,7 +101,8 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
     }
 
     private void refreshUI(List<Music> musics) {
-        MusicAdapter adapter = new MusicAdapter(musics);
+        int selectedId = binding.chipGroup.getCheckedChipId();
+        MusicAdapter adapter = new MusicAdapter(musics, (id, favorite) -> guitarAPI.patchMusicFavorite(id, favorite, selectedId == binding.chipFavorite.getId()));
         binding.recyclerView.setAdapter(adapter);
     }
 
