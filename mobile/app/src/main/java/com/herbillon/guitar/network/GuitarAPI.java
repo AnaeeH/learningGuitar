@@ -139,12 +139,49 @@ public class GuitarAPI {
             e.printStackTrace();
         }
 
-        Log.d("GuitarAPI", "patching music " + url);
+        Log.d("GuitarAPI", "patching music favorite " + url);
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.PATCH,
                 url, body,
                 response -> {
                     Log.d("GuitarAPI", "datas received : " + response);
                     fetchMusics(inFavorite);
+                    liveData.setValue(this);
+                }, error -> {
+            if (error.networkResponse != null) {
+                Log.e("GuitarAPI", "Status: " + error.networkResponse.statusCode);
+                Log.e("GuitarAPI", "Body: " + new String(error.networkResponse.data));
+            } else {
+                Log.e("GuitarAPI", error.toString());
+            }
+        }
+        ){
+            @Override
+            public Map<String, String> getHeaders () {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/merge-patch+json");
+                headers.put("Accept", "application/json");
+                return headers;
+            }
+        } ;
+        requestQueue.add(request);
+    }
+
+    public void patchMusicComment(int id, String comment) {
+        String url = API_BASE_URL + "/music/" + id + "/comment";
+
+        JSONObject body = new JSONObject();
+        try {
+            body.put("comment", comment);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("GuitarAPI", "patching music comment " + url);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PATCH,
+                url, body,
+                response -> {
+                    Log.d("GuitarAPI", "datas received : " + response);
+                    fetchMusic(id);
                     liveData.setValue(this);
                 }, error -> {
             if (error.networkResponse != null) {

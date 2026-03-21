@@ -97,6 +97,15 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
             ((TextView) composants.get("comment")).setText("");
         }
 
+        binding.textComment.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String newComment = binding.textComment.getText().toString().trim();
+                if (!newComment.equals(music.getComment())) {
+                    guitarAPI.patchMusicComment(musicId, newComment);
+                }
+            }
+        });
+
         if (music.getFavorite()){
             ((ImageView) composants.get("iconFavorite")).setVisibility(View.VISIBLE);
             ((TextView) composants.get("textFavorite")).setVisibility(View.VISIBLE);
