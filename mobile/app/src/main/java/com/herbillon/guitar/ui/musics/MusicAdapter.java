@@ -13,15 +13,17 @@ import com.herbillon.guitar.R;
 import com.herbillon.guitar.model.Music;
 
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder> {
     private List<Music> musics;
-    private BiConsumer<Integer, Boolean> onFavoriteClick;
+    private Consumer<Music> onFavoriteClick;
+    private Consumer<Music> onMusicClick;
 
-    public MusicAdapter(List<Music> m, BiConsumer<Integer,Boolean> onFavoriteClick) {
+    public MusicAdapter(List<Music> m, Consumer<Music> onFavoriteClick, Consumer<Music> onMusicClick) {
         this.musics = m;
         this.onFavoriteClick = onFavoriteClick;
+        this.onMusicClick = onMusicClick;
     }
 
     public static class MusicViewHolder extends RecyclerView.ViewHolder {
@@ -53,7 +55,10 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             holder.favorite.setImageResource(R.drawable.ic_star_outline);
         }
         holder.favorite.setOnClickListener(
-                v -> onFavoriteClick.accept(music.getId(), music.getFavorite())
+                v -> onFavoriteClick.accept(music)
+        );
+        holder.itemView.setOnClickListener(
+                v -> onMusicClick.accept(music)
         );
     }
 

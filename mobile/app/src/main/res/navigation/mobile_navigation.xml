@@ -15,13 +15,21 @@
         android:id="@+id/nav_musics"
         android:name="com.herbillon.guitar.ui.musics.MusicsFragment"
         android:label="Musics"
-        tools:layout="@layout/fragment_musics" />
+        tools:layout="@layout/fragment_musics">
+        <action
+            android:id="@+id/actionMusicsFragToMusicFrag"
+            app:destination="@id/nav_music" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_music"
         android:name="com.herbillon.guitar.ui.music.MusicFragment"
-        android:label="Music"
-        tools:layout="@layout/fragment_music" />
+        android:label="{musicTitle}"
+        tools:layout="@layout/fragment_music">
+        <argument
+            android:name="musicTitle"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_player"

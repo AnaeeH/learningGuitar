@@ -4,6 +4,7 @@ public class Music {
     private int id;
     private String title;
     private boolean favorite;
+    private int tempo;
     private String timeSignature;
     private String comment;
 
@@ -11,6 +12,15 @@ public class Music {
         this.id = id;
         this.title = n;
         this.favorite = f;
+    }
+
+    public Music(int id, String n, boolean f, int t, String timeSig, String c){
+        this.id = id;
+        this.title = n;
+        this.favorite = f;
+        this.tempo = t;
+        this.timeSignature = timeSig;
+        this.comment = c;
     }
 
     public int getId() {
@@ -22,14 +32,10 @@ public class Music {
     public boolean getFavorite() {
         return favorite;
     }
+    public int getTempo() { return tempo; }
     public String getTimeSignature() {
         return timeSignature;
     }
-    public String getComment() {
-        return comment;
-    }
+    public String getComment() { return comment; }
 
-    public void setFavorite(boolean f) { this.favorite = f; }
-    public void setTimeSignature(String t) { this.timeSignature = t; }
-    public void setComment(String c) { this.comment = c; }
 }

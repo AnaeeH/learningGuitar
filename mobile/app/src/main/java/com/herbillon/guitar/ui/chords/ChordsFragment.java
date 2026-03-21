@@ -78,6 +78,7 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
 
     private List<Chord> processDatas() {
         JSONArray datas = GuitarAPI.dataChords;
+        if (datas == null){ return null;}
         List<Chord> chords = new ArrayList<>();
         try {
             for (int i = 0; i < datas.length(); i++) {
@@ -98,6 +99,8 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
     }
 
     private void refreshUI(List<Chord> chords) {
+        if (chords == null){ return; }
+
         ChordAdapter adapter = new ChordAdapter(chords);
         binding.recyclerView.setAdapter(adapter);
     }

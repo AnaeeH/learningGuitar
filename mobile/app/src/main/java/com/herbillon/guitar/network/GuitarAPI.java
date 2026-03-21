@@ -107,6 +107,28 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
+    public void fetchMusic(int id){
+        String url = API_BASE_URL + "/music/" + id;
+        Log.d("GuitarAPI", "fetching music");
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                url, null,
+                response -> {
+                    Log.d("GuitarAPI", "datas music : " + response);
+                    dataSong = response;
+                    liveData.setValue(this);
+                }, error -> Log.e("GuitarAPI", error.toString())
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+                return headers;
+            }
+        };
+        requestQueue.add(request);
+    }
+
     public void patchMusicFavorite(int id, boolean favorite, boolean inFavorite) {
         String url = API_BASE_URL + "/music/" + id + "/favorite";
 

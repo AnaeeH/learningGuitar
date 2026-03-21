@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Handler;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.herbillon.guitar.GuitarApp;
+import com.herbillon.guitar.R;
 import com.herbillon.guitar.Refreshable;
 import com.herbillon.guitar.databinding.FragmentMusicsBinding;
 import com.herbillon.guitar.model.Chord;
@@ -101,8 +103,20 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
     }
 
     private void refreshUI(List<Music> musics) {
+        if (musics == null){ return; }
+
         int selectedId = binding.chipGroup.getCheckedChipId();
-        MusicAdapter adapter = new MusicAdapter(musics, (id, favorite) -> guitarAPI.patchMusicFavorite(id, favorite, selectedId == binding.chipFavorite.getId()));
+        boolean inFavorite = selectedId == binding.chipFavorite.getId();
+        MusicAdapter adapter = new MusicAdapter(
+                musics,
+                (music) -> guitarAPI.patchMusicFavorite(music.getId(), music.getFavorite(), inFavorite),
+                (music)  -> {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("musicId", music.getId());
+                    bundle.putString("musicTitle", music.getTitle());
+                    NavHostFragment.findNavController(this).navigate(com.herbillon.guitar.R.id.actionMusicsFragToMusicFrag, bundle);
+                } );
+
         binding.recyclerView.setAdapter(adapter);
     }
 
