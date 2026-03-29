@@ -31,6 +31,7 @@ public class GuitarAPI {
     public static JSONArray dataChords = null;
     public static JSONArray dataSongs = null;
     public static JSONObject dataSong = null;
+    public static JSONObject dataTablature = null;
     private final Handler handler = new Handler();
     private Runnable updateRunnable;
 
@@ -115,6 +116,28 @@ public class GuitarAPI {
                 response -> {
                     Log.d("GuitarAPI", "datas music : " + response);
                     dataSong = response;
+                    liveData.setValue(this);
+                }, error -> Log.e("GuitarAPI", error.toString())
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+                return headers;
+            }
+        };
+        requestQueue.add(request);
+    }
+
+    public void fetchTablature(int id){
+        String url = API_BASE_URL + "/music/tablature/" + id;
+        Log.d("GuitarAPI", "fetching tablature");
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                url, null,
+                response -> {
+                    Log.d("GuitarAPI", "tablature received : " + response);
+                    dataTablature = response;
                     liveData.setValue(this);
                 }, error -> Log.e("GuitarAPI", error.toString())
         ) {

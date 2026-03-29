@@ -27,6 +27,25 @@
         android:label="{musicTitle}"
         tools:layout="@layout/fragment_music">
         <argument
+            android:name="musicId"
+            app:argType="integer" />
+        <argument
+            android:name="musicTitle"
+            app:argType="string" />
+        <action
+            android:id="@+id/actionMusicFragToTablatureFrag"
+            app:destination="@id/nav_tablature" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_tablature"
+        android:name="com.herbillon.guitar.ui.music.TablatureFragment"
+        android:label="{musicTitle}"
+        tools:layout="@layout/fragment_tablature">
+        <argument
+            android:name="musicId"
+            app:argType="integer" />
+        <argument
             android:name="musicTitle"
             app:argType="string" />
     </fragment>

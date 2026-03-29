@@ -20,15 +20,15 @@ class Measure
     private ?int $id = null;
 
     #[ORM\Column(name: 'mea_numero')]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:partition', 'music:tablature'])]
     private ?int $numero = null;
 
     #[ORM\Column(nullable: true, name: 'mea_tempo')]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:partition', 'music:tablature'])]
     private ?int $tempo = null;
 
     #[ORM\Column(length: 32, nullable: true, name: 'mea_time_signature')]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:partition', 'music:tablature'])]
     private ?string $timeSignature = null;
 
     #[ORM\ManyToOne(inversedBy: 'measures')]
@@ -44,7 +44,7 @@ class Measure
         cascade: ['remove'],
         orphanRemoval: true
     )]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:partition', 'music:tablature'])]
     private Collection $beats;
 
     public function __construct()

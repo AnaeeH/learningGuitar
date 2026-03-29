@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\BeatRepository;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BeatRepository::class)]
@@ -16,37 +17,53 @@ class Beat
     #[ORM\Column(name: 'bea_id')]
     private ?int $id = null;
 
+    #[ORM\Column(name: 'bea_is_rest', options: ['default' => false])]
+    #[Groups(['music:partition', 'music:tablature'])]
+    private bool $isRest = false;
+
+    #[ORM\Column(name: 'bea_position')]
+    #[Groups(['music:partition', 'music:tablature'])]
+    private int $position = 0;
+
     #[ORM\Column(length: 2, nullable: true, name: 'bea_pitch_step')]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:partition'])]
     private ?string $pitchStep = null;
 
     #[ORM\Column(nullable: true, name: 'bea_pitch_octave')]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:partition'])]
     private ?int $pitchOctave = null;
 
     #[ORM\Column(nullable: true, name: 'bea_pitch_alter')]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:partition'])]
     private ?float $pitchAlter = null;
 
     #[ORM\Column(name: 'bea_duration')]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:partition', 'music:tablature'])]
     private ?int $duration;
 
     #[ORM\Column(length: 16, name: 'bea_type')]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:partition', 'music:tablature'])]
     private ?string $type;
 
     #[ORM\Column(name: 'bea_dot')]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:partition', 'music:tablature'])]
     private ?bool $dot = false;
 
     #[ORM\Column(nullable: true, name: 'bea_string')]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:tablature'])]
     private ?int $string = null;
 
     #[ORM\Column(nullable: true, name: 'bea_fret')]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:tablature'])]
     private ?int $fret = null;
+
+    #[ORM\Column(length: 8, nullable: true, name: 'bea_harmony_text')]
+    #[Groups(['music:partition', 'music:tablature'])]
+    private ?string $harmonyText = null;
+
+    #[ORM\Column(length: 8, nullable: true, name: 'bea_strum_direction')]
+    #[Groups(['music:partition', 'music:tablature'])]
+    private ?string $strumDirection = null;
 
     #[ORM\ManyToOne(inversedBy: 'beats')]
     #[ORM\JoinColumn(name: 'bea_mea_id', referencedColumnName: 'mea_id')]
@@ -55,6 +72,30 @@ class Beat
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getIsRest(): ?bool
+    {
+        return $this->isRest;
+    }
+
+    public function setIsRest(?bool $isRest): static
+    {
+        $this->isRest = $isRest;
+
+        return $this;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?int $position): static
+    {
+        $this->position = $position;
+
+        return $this;
     }
 
     public function getPitchStep(): ?string
@@ -149,6 +190,30 @@ class Beat
     public function setFret(?int $fret): static
     {
         $this->fret = $fret;
+
+        return $this;
+    }
+
+    public function getHarmonyText(): ?String
+    {
+        return $this->harmonyText;
+    }
+
+    public function setHarmonyText(?String $harmonyText): static
+    {
+        $this->harmonyText = $harmonyText;
+
+        return $this;
+    }
+
+    public function getStrumDirection(): ?String
+    {
+        return $this->strumDirection;
+    }
+
+    public function setStrumDirection(?String $strumDirection): static
+    {
+        $this->strumDirection = $strumDirection;
 
         return $this;
     }

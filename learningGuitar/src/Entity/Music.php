@@ -33,7 +33,18 @@ use Symfony\Component\HttpFoundation\File\File;
             uriTemplate: '/musics',
             normalizationContext: ['groups' => ['music:read']]
         ),
-        new Get(uriTemplate: '/music/{id}'),
+        new Get(
+            uriTemplate: '/music/{id}',
+            normalizationContext: ['groups' => ['music:detail']]
+        ),
+        new Get(
+            uriTemplate: '/music/partition/{id}',
+            normalizationContext: ['groups' => ['music:detail', 'music:partition']]
+        ),
+        new Get(
+            uriTemplate: '/music/tablature/{id}',
+            normalizationContext: ['groups' => ['music:detail', 'music:tablature']]
+        ),
         new Post(
             uriTemplate: '/music',
             inputFormats: ['multipart' => ['multipart/form-data']],
@@ -115,7 +126,7 @@ class Music
         cascade: ['remove'],
         orphanRemoval: true
     )]
-    #[Groups(['music:detail'])]
+    #[Groups(['music:partition', 'music:tablature'])]
     private Collection $measures;
 
     #[ORM\OneToOne(mappedBy: 'music', cascade: ['persist', 'remove'])]

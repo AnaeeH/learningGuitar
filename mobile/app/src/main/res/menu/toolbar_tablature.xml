@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/dark_background2"
+    >
+
+    <item
+        android:id="@+id/action_tempo"
+        android:title="Tempo"
+        app:showAsAction="always"
+        app:actionLayout="@layout/toolbar_tempo" />
+
+    <item
+        android:id="@+id/action_mode"
+        android:title="Tablature"
+        app:showAsAction="always"
+        app:actionLayout="@layout/toolbar_badge_tablature"/>
+</menu>

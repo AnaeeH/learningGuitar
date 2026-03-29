@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
@@ -62,6 +63,15 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         GuitarAPI.dataSong = null;
         guitarAPI.fetchMusic(musicId);
 
+        binding.btnTablature.setOnClickListener(v -> {
+            if (music == null) return;
+            Bundle args = new Bundle();
+            args.putInt("musicId", musicId);
+            args.putString("musicTitle", music.getTitle());
+            Navigation.findNavController(v)
+                    .navigate(com.herbillon.guitar.R.id.actionMusicFragToTablatureFrag, args);
+        });
+
         return view;
     }
 
@@ -83,6 +93,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        GuitarAPI.dataSong = null;
     }
 
     private void refreshUI() {
@@ -126,6 +137,10 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
 
     @Override
     public void onChanged(Object o) {
+        Log.d("MusicFragment", "onChanged called, dataSong=" + GuitarAPI.dataSong);
+        Log.d("MusicFragment", "onChanged called, dataTablature=" + GuitarAPI.dataTablature);
+
+        if (GuitarAPI.dataSong == null) return;
         binding.scrollContent.setVisibility(View.GONE);
         binding.progressBar.setVisibility(View.VISIBLE);
         processDatas();

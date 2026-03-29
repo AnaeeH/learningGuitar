@@ -91,19 +91,23 @@ class MusicProcessor implements ProcessorInterface
             $music->setTitle($title);
         }
 
-        $tempo = (int) $xml->part->measure->direction->{'sound'}['tempo'];
-        if ($tempo > 0) {
-            $music->setTempo($tempo);
+        $firstMeasure = $xml->part->measure[0];
+        foreach ($firstMeasure->direction as $direction) {
+            $tempo = (int) $direction->sound['tempo'];
+            if ($tempo > 0) {
+                $music->setTempo($tempo);
+                break;
+            }
         }
 
-        $beats = (string) $xml->part->measure->attributes->time->beats;
-        $beatType = (string) $xml->part->measure->attributes->time->{'beat-type'};
+        $beats = (string) $firstMeasure->attributes->time->beats;
+        $beatType = (string) $firstMeasure->attributes->time->{'beat-type'};
         if (!empty($beats) && !empty($beatType)) {
             $music->setTimeSignature($beats . '/' . $beatType);
         }
 
-        $fifths = (string) $xml->part->measure->attributes->key->fifths;
-        $mode = (string) $xml->part->measure->attributes->key->mode;
+        $fifths = (string) $firstMeasure->attributes->key->fifths;
+        $mode = (string) $firstMeasure->attributes->key->mode;
         if (!empty($mode)) {
             $music->setKeySignature($fifths . ' ' . $mode);
         }
@@ -118,17 +122,23 @@ class MusicProcessor implements ProcessorInterface
             $measure->setNumero((int) $measureNode['number']);
             $measure->setMusic($music);
 
-            $measureTempo = (int) $measureNode->direction->sound['tempo'];
-            if ($measureTempo > 0 && $measureTempo !== $music->getTempo()) {
-                $measure->setTempo($measureTempo);
+            foreach ($measureNode->direction as $direction) {
+                $measureTempo = (int) $direction->sound['tempo'];
+                if ($measureTempo > 0 && $measureTempo !== $music->getTempo()) {
+                    $measure->setTempo($measureTempo);
+                    break;
+                }
             }
 
-            $measureBeats = (string) $measureNode->attributes->time->beats;
-            $measureBeatType = (string) $measureNode->attributes->time->{'beat-type'};
-            if (!empty($measureBeats) && !empty($measureBeatType)) {
-                $sig = $measureBeats . '/' . $measureBeatType;
-                if ($sig !== $music->getTimeSignature()) {
-                    $measure->setTimeSignature($sig);
+            $timeNode = $measureNode->attributes->time ?? null;
+            if ($timeNode !== null) {
+                $measureBeats = (string) $timeNode->beats;
+                $measureBeatType = (string) $timeNode->{'beat-type'};
+                if (!empty($measureBeats) && !empty($measureBeatType)) {
+                    $sig = $measureBeats . '/' . $measureBeatType;
+                    if ($sig !== $music->getTimeSignature()) {
+                        $measure->setTimeSignature($sig);
+                    }
                 }
             }
 
@@ -141,32 +151,155 @@ class MusicProcessor implements ProcessorInterface
 
     private function parseXMLNotes(mixed $measureNode, Measure $measure, int $staves): void
     {
-        foreach ($measureNode->note as $noteNode) {
-            if ($staves === 2 && (int) $noteNode->staff === 1) {
+        $positionByVoice = [];
+        $pendingHarmonyByVoice = [];
+
+        foreach ($measureNode->children() as $child) {
+            $nodeName = $child->getName();
+
+            if ($nodeName === 'harmony') {
+                $kindText = (string) $child->kind['text'];
+                $root     = (string) $child->root->{'root-step'};
+                // On stocke l'harmonie en attente — elle sera attribuée à la prochaine note non-chord
+                $lastHarmony = $kindText !== '' ? $root . $kindText : $root;
+                // On l'associe à toutes les voix (on ne sait pas encore quelle voix la prendra)
+                $pendingHarmony = $lastHarmony;
                 continue;
             }
 
+            if ($nodeName !== 'note') {
+                continue;
+            }
+
+            $voice   = (int) $child->voice;
+            $staff   = (int) $child->staff;
+            $isChord = isset($child->chord);
+            $isRest  = isset($child->rest);
+            $duration = (int) $child->duration;
+
+            // Initialiser la position de cette voix
+            if (!isset($positionByVoice[$voice])) {
+                $positionByVoice[$voice] = 0;
+            }
+
+            // Ignorer staff 1 (partition classique) — on ne traite que la tablature (staff 2)
+            // SAUF si staves == 1 (fichier sans double portée)
+            if ($staves >= 2 && $staff === 1) {
+                if (!$isChord) {
+                    $positionByVoice[$voice] += $duration;
+                }
+                // On consomme quand même l'harmonie en attente si c'est la première note de l'accord
+                if (!$isChord && isset($pendingHarmony)) {
+                    $pendingHarmonyByVoice[$voice] = $pendingHarmony;
+                    unset($pendingHarmony);
+                }
+                continue;
+            }
+
+            // Pour staff 2 : on ignore les notes chord (doublons de la mélodie dans les accords plaqués)
+            // SAUF si c'est une note avec fret/string info (tablature individuelle)
+            $hasTablature = isset($child->notations->technical->string);
+
+            if ($isChord) {
+                // Dans le fichier 1, les chords sur staff 2 sont des doublons → on ignore
+                // Dans le fichier 2, les chords sur staff 2 peuvent avoir leur propre fret (ex mesure 24)
+                // On les sauvegarde seulement s'ils ont des infos de tablature distinctes
+                if (!$hasTablature) {
+                    continue;
+                }
+                // chord avec tablature → on crée un Beat à la même position que la note précédente
+                $beat = new Beat();
+                $beat->setMeasure($measure);
+                $beat->setDuration($duration);
+                $beat->setType((string) $child->type);
+                $beat->setDot(isset($child->dot));
+                $beat->setIsRest(false);
+                $beat->setPosition($positionByVoice[$voice]); // même position que la note parente
+
+                if (isset($child->notations->technical->string)) {
+                    $beat->setString((int) $child->notations->technical->string);
+                    $beat->setFret((int) $child->notations->technical->fret);
+                }
+                $beat->setPitchStep((string) $child->pitch->step);
+                $beat->setPitchOctave((int) $child->pitch->octave);
+                if (isset($child->pitch->alter)) {
+                    $beat->setPitchAlter((float) $child->pitch->alter);
+                }
+
+                $this->em->persist($beat);
+                continue;
+            }
+
+            // Note normale (non-chord) sur staff 2
             $beat = new Beat();
             $beat->setMeasure($measure);
+            $beat->setDuration($duration);
+            $beat->setType((string) $child->type);
+            $beat->setDot(isset($child->dot));
+            $beat->setIsRest($isRest);
+            $beat->setPosition($positionByVoice[$voice]);
 
-            if (!isset($noteNode->rest)) {
-                $beat->setPitchStep((string) $noteNode->pitch->step);
-                $beat->setPitchOctave((int) $noteNode->pitch->octave);
+            // Attribuer l'harmonie en attente (venant de <harmony> ou de la voix miroir staff 1)
+            $harmonyToApply = $pendingHarmonyByVoice[$voice] ?? $pendingHarmony ?? null;
+            if ($harmonyToApply !== null) {
+                $beat->setHarmonyText($harmonyToApply);
+                $beat->setStrumDirection($this->extractStrumDirection($child));
+                unset($pendingHarmonyByVoice[$voice]);
+                unset($pendingHarmony);
+            }
 
-                if (isset($noteNode->pitch->alter)) {
-                    $beat->setPitchAlter((float) $noteNode->pitch->alter);
+            if (!$isRest) {
+                $beat->setPitchStep((string) $child->pitch->step);
+                $beat->setPitchOctave((int) $child->pitch->octave);
+                if (isset($child->pitch->alter)) {
+                    $beat->setPitchAlter((float) $child->pitch->alter);
                 }
-
-                if (isset($noteNode->notations->technical->string)) {
-                    $beat->setString((int) $noteNode->notations->technical->string);
-                    $beat->setFret((int) $noteNode->notations->technical->fret);
+                if ($hasTablature) {
+                    $beat->setString((int) $child->notations->technical->string);
+                    $beat->setFret((int) $child->notations->technical->fret);
                 }
             }
-            $beat->setDuration((int) $noteNode->duration);
-            $beat->setType((string) $noteNode->type);
-            $beat->setDot(isset($noteNode->dot));
 
             $this->em->persist($beat);
+            $positionByVoice[$voice] += $duration;
         }
+    }
+
+    // if ($staves === 2 && (int) $noteNode->staff === 1) {
+    //     continue;
+    // }
+
+    // $beat = new Beat();
+    // $beat->setMeasure($measure);
+
+    // if (!isset($noteNode->rest)) {
+    //     $beat->setPitchStep((string) $noteNode->pitch->step);
+    //     $beat->setPitchOctave((int) $noteNode->pitch->octave);
+
+    //     if (isset($noteNode->pitch->alter)) {
+    //         $beat->setPitchAlter((float) $noteNode->pitch->alter);
+    //     }
+
+    //     if (isset($noteNode->notations->technical->string)) {
+    //         $beat->setString((int) $noteNode->notations->technical->string);
+    //         $beat->setFret((int) $noteNode->notations->technical->fret);
+    //     }
+    // }
+    // $beat->setDuration((int) $noteNode->duration);
+    // $beat->setType((string) $noteNode->type);
+    // $beat->setDot(isset($noteNode->dot));
+
+
+    // $this->em->persist($beat);
+
+    private function extractStrumDirection(\SimpleXMLElement $noteNode): ?string
+    {
+        if (!isset($noteNode->notations->technical)) {
+            return null;
+        }
+        $technical = $noteNode->notations->technical;
+        if (isset($technical->{'down-bow'})) return 'down';
+        if (isset($technical->{'up-bow'}))   return 'up';
+        return null;
     }
 }

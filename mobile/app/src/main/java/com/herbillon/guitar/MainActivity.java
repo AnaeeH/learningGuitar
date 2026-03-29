@@ -1,7 +1,12 @@
 package com.herbillon.guitar;
 
+import android.graphics.Insets;
 import android.os.Bundle;
+
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
@@ -14,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
@@ -22,7 +28,16 @@ public class MainActivity extends AppCompatActivity {
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         NavigationUI.setupWithNavController(toolbar, navController);
-        toolbar.inflateMenu(R.menu.toolbar_menu);
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            toolbar.getMenu().clear();
+            if (destination.getId() == R.id.nav_tablature) {
+                toolbar.inflateMenu(R.menu.toolbar_tablature);
+                toolbar.setBackgroundColor(getColor(R.color.dark_background2));
+            } else {
+                toolbar.inflateMenu(R.menu.toolbar_menu);
+                toolbar.setBackgroundColor(getColor(R.color.dark_mainColor));
+            }
+        });
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_nav);
         NavigationUI.setupWithNavController(bottomNav, navController);
