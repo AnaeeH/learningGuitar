@@ -4,23 +4,23 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
 
-        <!-- Background -->
-        <item name="android:windowBackground">@color/dark_background</item>
-        <item name="colorOnBackground">@color/dark_mainColor</item>
+            <!-- Background -->
+            <item name="android:windowBackground">@color/dark_background</item>
+            <item name="colorOnBackground">@color/dark_mainColor</item>
 
-        <!-- Line -->
-        <item name="colorOutline">@color/dark_line</item>
+            <!-- Line -->
+            <item name="colorOutline">@color/dark_line</item>
 
-        <!-- Primary -->
-        <item name="colorPrimary">@color/dark_background2</item>
-        <item name="colorOnPrimary">@color/dark_text</item>
+            <!-- Primary -->
+            <item name="colorPrimary">@color/dark_background2</item>
+            <item name="colorOnPrimary">@color/dark_text</item>
 
-        <!-- Badge Partition -->
-        <item name="colorSecondary">@color/dark_bagde</item>
-        <item name="colorOnSecondary">@color/dark_textSecondary</item>
+            <!-- Badge Partition -->
+            <item name="colorSecondary">@color/dark_bagde</item>
+            <item name="colorOnSecondary">@color/dark_textSecondary</item>
 
-        <!-- Badge Tab-->
-        <item name="colorTertiary">@color/dark_tabBackground</item>
-        <item name="colorOnTertiary">@color/dark_tabText</item>
+            <!-- Badge Tab-->
+            <item name="colorTertiary">@color/dark_tabBackground</item>
+            <item name="colorOnTertiary">@color/dark_tabText</item>
     </style>
 </resources>

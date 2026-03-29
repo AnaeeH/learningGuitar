@@ -7,28 +7,25 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.herbillon.guitar.GuitarApp;
 import com.herbillon.guitar.R;
 import com.herbillon.guitar.databinding.FragmentTablatureBinding;
-import com.herbillon.guitar.model.Measure;
 import com.herbillon.guitar.network.GuitarAPI;
 
 import org.json.JSONException;
 
-import java.util.List;
-
-public class TablatureFragment extends Fragment implements Observer {
+public class TablatureFragment extends AbstractMusicFragment implements Observer {
     private FragmentTablatureBinding binding;
     private GuitarAPI guitarAPI;
     private int musicId;
-    private List<Measure> measures;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,8 +52,10 @@ public class TablatureFragment extends Fragment implements Observer {
     private void processDatas() {
         try {
             measures = MusicParser.parseMeasures(GuitarAPI.dataTablature);
-            int tempo = GuitarAPI.dataTablature.getInt("tempo");
+            tempo = GuitarAPI.dataTablature.getInt("tempo");
             String timeSignature = GuitarAPI.dataTablature.getString("time_signature");
+            time1 = Integer.parseInt(timeSignature.split("/")[0]);
+            time2 = Integer.parseInt(timeSignature.split("/")[1]);
             GuitarAPI.dataTablature = null;
 
             Log.d("Tablature", measures.size() + " mesures reçues");
@@ -75,6 +74,9 @@ public class TablatureFragment extends Fragment implements Observer {
 
     private void refreshUI() {
         if (measures == null) return;
+        SheetView sheetView = binding.sheetView;
+        sheetView.setMusique(measures.size(), time1, time2, 6);
+        setupControls();
     }
 
     @Override
@@ -83,8 +85,10 @@ public class TablatureFragment extends Fragment implements Observer {
         requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         requireActivity().getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_FULLSCREEN |
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
         );
 
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
@@ -94,6 +98,7 @@ public class TablatureFragment extends Fragment implements Observer {
     @Override
     public void onPause() {
         super.onPause();
+
         requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         requireActivity().getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_VISIBLE
@@ -107,7 +112,10 @@ public class TablatureFragment extends Fragment implements Observer {
     public void onChanged(Object o) {
         if (GuitarAPI.dataTablature == null) return;
         processDatas();
-        refreshUI();
+        requireActivity().runOnUiThread(() -> {
+            calculateTotalDuration();
+            refreshUI();
+        });
     }
 
     @Override
@@ -115,5 +123,45 @@ public class TablatureFragment extends Fragment implements Observer {
         super.onDestroyView();
         guitarAPI.removeObserver(this);
         binding = null;
+    }
+
+    @Override
+    protected HorizontalScrollView getScrollView() {
+        return binding.horizontalScrollView;
+    }
+
+    @Override
+    protected SheetView getSheetView() {
+        return binding.sheetView;
+    }
+
+    @Override
+    protected View getBtnPlay() {
+        return binding.musicControls.btnPlay;
+    }
+
+    @Override
+    protected View getBtnSkipBack() {
+        return binding.musicControls.btnSkipBack;
+    }
+
+    @Override
+    protected View getBtnSkipForward() {
+        return binding.musicControls.btnSkipForward;
+    }
+
+    @Override
+    protected SeekBar getSeekBar() {
+        return binding.musicControls.seekBar;
+    }
+
+    @Override
+    protected TextView getTextDuration() {
+        return binding.musicControls.textDuration;
+    }
+
+    @Override
+    protected View getPlaybackCursor() {
+        return binding.playbackCursor;
     }
 }
