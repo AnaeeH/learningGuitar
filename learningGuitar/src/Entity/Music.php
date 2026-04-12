@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MusicRepository;
+use App\Enum\MusicStatus;
+use App\Enum\MusicDifficulty;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -62,6 +64,11 @@ use Symfony\Component\HttpFoundation\File\File;
             denormalizationContext: ['groups' => ['music:comment']],
             normalizationContext: ['groups' => ['music:read']]
         ),
+        new Patch(
+            uriTemplate: '/music/{id}/status',
+            denormalizationContext: ['groups' => ['music:status']],
+            normalizationContext: ['groups' => ['music:read']]
+        ),
         new Delete(
             uriTemplate: '/music/{id}/delete',
             processor: MusicDeleteProcessor::class,
@@ -83,6 +90,10 @@ class Music
     #[Groups(['music:read', 'music:detail'])]
     private ?string $title = null;
 
+    #[ORM\Column(length: 32, nullable: true, name: 'mus_artist')]
+    #[Groups(['music:read', 'music:detail'])]
+    private ?string $artist = null;
+
     #[ORM\Column(nullable: true, name: 'mus_tempo')]
     #[Groups(['music:detail'])]
     private ?int $tempo = null;
@@ -99,9 +110,21 @@ class Music
     #[Groups(['music:read', 'music:favorite', 'music:detail'])]
     private bool $favorite = false;
 
+    #[ORM\Column(name: 'mus_riff')]
+    #[Groups(['music:write', 'music:detail'])]
+    private bool $riff = false;
+
     #[ORM\Column(length: 255, nullable: true, name: 'mus_comment')]
     #[Groups(['music:read', 'music:comment', 'music:detail'])]
     private ?string $comment = null;
+
+    #[ORM\Column(type: 'string', length: 16, nullable: false, name: 'mus_status', enumType: MusicStatus::class)]
+    #[Groups(['music:read', 'music:detail', 'music:status'])]
+    private ?MusicStatus $status = MusicStatus::TO_LEARN;
+
+    #[ORM\Column(type: 'string', length: 16, nullable: false, name: 'mus_difficulty', enumType: MusicDifficulty::class)]
+    #[Groups(['music:read', 'music:detail', 'music:difficulty'])]
+    private ?MusicDifficulty $difficulty = MusicDifficulty::EASY;
 
     private ?string $xmlFileName = null;
 
@@ -149,12 +172,25 @@ class Music
         return $this->title;
     }
 
+    public function getArtist(): ?string
+    {
+        return $this->artist;
+    }
+
     public function setTitle(?string $title): static
     {
         $this->title = $title;
 
         return $this;
     }
+
+    public function setArtist(?string $artist): static
+    {
+        $this->artist = $artist;
+
+        return $this;
+    }
+
 
     public function getTempo(): ?int
     {
@@ -192,6 +228,28 @@ class Music
         return $this;
     }
 
+    public function getStatus(): ?MusicStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?MusicStatus $status): static
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getDifficulty(): ?MusicDifficulty
+    {
+        return $this->difficulty;
+    }
+
+    public function setDifficulty(?MusicDifficulty $difficulty): static
+    {
+        $this->difficulty = $difficulty;
+        return $this;
+    }
+
     public function getXmlFileName(): ?string
     {
         return $this->xmlFileName;
@@ -223,6 +281,18 @@ class Music
     public function setFavorite(bool $favorite): static
     {
         $this->favorite = $favorite;
+
+        return $this;
+    }
+
+    public function isRiff(): ?bool
+    {
+        return $this->riff;
+    }
+
+    public function setRiff(bool $riff): static
+    {
+        $this->riff = $riff;
 
         return $this;
     }

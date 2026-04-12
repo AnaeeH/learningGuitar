@@ -9,7 +9,6 @@ use App\Entity\Measure;
 use App\Entity\Music;
 use App\Entity\Video;
 use Doctrine\ORM\EntityManagerInterface;
-use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -51,6 +50,9 @@ class MusicProcessor implements ProcessorInterface
             $music->setAudioPath($originalName);
         }
 
+        $riff = $request->request->get('riff', 'false');
+        $music->setRiff(filter_var($riff, FILTER_VALIDATE_BOOLEAN));
+
         $this->em->persist($music);
         $this->em->flush();
 
@@ -90,6 +92,11 @@ class MusicProcessor implements ProcessorInterface
         $title = (string) $xml->work->{'work-title'};
         if (!empty($title)) {
             $music->setTitle($title);
+        }
+
+        $artist = (string) $xml->identification->{'creator'};
+        if (!empty($artist)) {
+            $music->setArtist($artist);
         }
 
         $firstMeasure = $xml->part->measure[0];
