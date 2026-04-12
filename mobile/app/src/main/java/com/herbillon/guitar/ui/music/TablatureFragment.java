@@ -18,6 +18,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.herbillon.guitar.GuitarApp;
 import com.herbillon.guitar.R;
 import com.herbillon.guitar.databinding.FragmentTablatureBinding;
+import com.herbillon.guitar.model.Beat;
 import com.herbillon.guitar.network.GuitarAPI;
 
 import org.json.JSONException;
@@ -72,10 +73,20 @@ public class TablatureFragment extends AbstractMusicFragment implements Observer
         }
     }
 
+    private boolean firstMeasureHasNotes() {
+        if (measures == null || measures.isEmpty()) return false;
+        for (Beat beat : measures.get(0).beats) {
+            if (!beat.isRest && beat.string != -1) return true;
+        }
+        return false;
+    }
+
     private void refreshUI() {
         if (measures == null) return;
+        hasPickupMeasure = firstMeasureHasNotes();
+        binding.sheetView.setHasPickupMeasure(hasPickupMeasure);
         SheetView sheetView = binding.sheetView;
-        sheetView.setMusique(measures.size(), time1, time2, 6);
+        sheetView.setMusique(measures, measures.size(), time1, time2, 6);
         setupControls();
     }
 

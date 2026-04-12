@@ -22,6 +22,7 @@ public abstract class AbstractMusicFragment extends Fragment {
     protected int time1;
     protected int time2;
     protected List<Measure> measures;
+    protected boolean hasPickupMeasure;
 
     private ValueAnimator scrollAnimator;
     private float scrollPosition = 0f;
@@ -41,7 +42,8 @@ public abstract class AbstractMusicFragment extends Fragment {
 
 
     private float getTotalScrollable() {
-        return getSheetView().getMeasureWidth() * measures.size() + cursorOffsetPx;
+        int total = measures.size() + (hasPickupMeasure ? 1 : 0);
+        return getSheetView().getMeasureWidth() * total;
     }
 
     private String formatTime(int totalSeconds) {
@@ -55,8 +57,9 @@ public abstract class AbstractMusicFragment extends Fragment {
     }
 
     protected void calculateTotalDuration() {
-        float secondsPerMeasure = (time1 * 60f) / tempo;
-        int totalSeconds = (int) (secondsPerMeasure * measures.size());
+        float secondsPerMeasure = time1 * (60f / tempo);
+        int total = measures.size() + (hasPickupMeasure ? 1 : 0);
+        int totalSeconds = (int) (secondsPerMeasure * total);
         totalDurationMs = totalSeconds * 1000L;
         totalDurationFormatted = formatTime(totalSeconds);
     }

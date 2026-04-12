@@ -6,6 +6,7 @@ public class Beat {
     public int duration;
     public String type;
     public boolean dot;
+    public boolean tied;
 
     // Partition
     public String pitchStep;
@@ -15,4 +16,9 @@ public class Beat {
     // Tablature
     public int string;
     public int fret;
+
+    // Chords
+    public String harmonyText;
+    public String strumDirection;
+
 }

@@ -26,6 +26,7 @@ public class MusicParser {
                 JSONObject bObj = beatsArray.getJSONObject(j);
                 Beat beat = new Beat();
                 beat.isRest = bObj.getBoolean("isRest");
+                beat.tied = bObj.optBoolean("tied");
                 beat.position = bObj.getInt("position");
                 beat.duration = bObj.getInt("duration");
                 beat.type = bObj.getString("type");
@@ -37,6 +38,9 @@ public class MusicParser {
 
                 beat.string = bObj.optInt("string", -1);
                 beat.fret = bObj.optInt("fret", -1);
+
+                beat.harmonyText = bObj.optString("harmonyText", null);
+                beat.strumDirection = bObj.optString("strumDirection", null);
 
                 measure.beats.add(beat);
             }

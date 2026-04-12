@@ -69,6 +69,10 @@ class Beat
     #[ORM\JoinColumn(name: 'bea_mea_id', referencedColumnName: 'mea_id')]
     private ?Measure $measure = null;
 
+    #[ORM\Column(name: 'bea_tied')]
+    #[Groups(['music:partition', 'music:tablature'])]
+    private ?bool $tied = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -226,6 +230,18 @@ class Beat
     public function setMeasure(?Measure $measure): static
     {
         $this->measure = $measure;
+
+        return $this;
+    }
+
+    public function isTied(): ?bool
+    {
+        return $this->tied;
+    }
+
+    public function setTied(bool $tied): static
+    {
+        $this->tied = $tied;
 
         return $this;
     }
