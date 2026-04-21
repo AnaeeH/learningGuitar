@@ -9,22 +9,38 @@
     android:padding="12dp">
 
     <ImageView
+        android:id="@+id/musicDifficulty"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/ic_music_note"
+        android:src="@drawable/ic_music_note_hard"
         android:scaleType="centerInside" />
 
-    <TextView
-        android:id="@+id/musicTitle"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:maxLines="1"
-        android:ellipsize="end"/>
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/musicTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:id="@+id/musicArtist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/musicFavorite"

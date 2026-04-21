@@ -24,7 +24,9 @@ use Symfony\Component\HttpFoundation\File\File;
 
 #[ApiFilter(SearchFilter::class, properties: [
     'title'    => 'ipartial', // /api/musics?title=SanFran
-    'favorite' => 'exact'
+    'favorite' => 'exact', 
+    'status'     => 'exact',  
+    'difficulty' => 'exact', 
 ])]
 #[ApiResource(
     paginationEnabled: true,
@@ -67,6 +69,11 @@ use Symfony\Component\HttpFoundation\File\File;
         new Patch(
             uriTemplate: '/music/{id}/status',
             denormalizationContext: ['groups' => ['music:status']],
+            normalizationContext: ['groups' => ['music:read']]
+        ),
+        new Patch(
+            uriTemplate: '/music/{id}/difficulty',
+            denormalizationContext: ['groups' => ['music:difficulty']],
             normalizationContext: ['groups' => ['music:read']]
         ),
         new Delete(

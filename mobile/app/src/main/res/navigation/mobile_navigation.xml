@@ -32,6 +32,9 @@
         <argument
             android:name="musicTitle"
             app:argType="string" />
+        <argument
+            android:name="musicArtist"
+            app:argType="string" />
         <action
             android:id="@+id/actionMusicFragToTablatureFrag"
             app:destination="@id/nav_tablature" />
@@ -47,6 +50,9 @@
             app:argType="integer" />
         <argument
             android:name="musicTitle"
+            app:argType="string" />
+        <argument
+            android:name="musicArtist"
             app:argType="string" />
     </fragment>
 

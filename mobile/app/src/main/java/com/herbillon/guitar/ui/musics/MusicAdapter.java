@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.herbillon.guitar.R;
 import com.herbillon.guitar.model.Music;
+import com.herbillon.guitar.utils.MusicConstants;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -28,12 +29,16 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
 
     public static class MusicViewHolder extends RecyclerView.ViewHolder {
         TextView title;
+        TextView artist;
         ImageView favorite;
+        ImageView difficulty;
 
         public MusicViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.musicTitle);
+            artist = itemView.findViewById(R.id.musicArtist);
             favorite = itemView.findViewById(R.id.musicFavorite);
+            difficulty = itemView.findViewById(R.id.musicDifficulty);
         }
     }
 
@@ -49,6 +54,20 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
     public void onBindViewHolder(@NonNull MusicAdapter.MusicViewHolder holder, int position) {
         Music music = musics.get(position);
         holder.title.setText(music.getTitle());
+        holder.artist.setText(music.getArtist());
+
+        switch (music.getDifficulty()) {
+            case MusicConstants.DIFFICULTY_MEDIUM:
+                holder.difficulty.setImageResource(R.drawable.ic_music_note_medium);
+                break;
+            case MusicConstants.DIFFICULTY_HARD:
+                holder.difficulty.setImageResource(R.drawable.ic_music_note_hard);
+                break;
+            default:
+                holder.difficulty.setImageResource(R.drawable.ic_music_note_easy);
+                break;
+        }
+
         if (music.getFavorite()){
             holder.favorite.setImageResource(R.drawable.ic_star_filled);
         } else {

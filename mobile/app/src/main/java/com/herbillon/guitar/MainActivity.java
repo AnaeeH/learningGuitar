@@ -37,6 +37,12 @@ public class MainActivity extends AppCompatActivity {
                 toolbar.inflateMenu(R.menu.toolbar_menu);
                 toolbar.setBackgroundColor(getColor(R.color.dark_mainColor));
             }
+
+            if ((destination.getId() == R.id.nav_music || destination.getId() == R.id.nav_tablature) && arguments != null) {
+                toolbar.setSubtitle(arguments.getString("musicArtist"));
+            } else {
+                toolbar.setSubtitle(null);
+            }
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {

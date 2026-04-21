@@ -17,7 +17,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -81,11 +83,22 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
-    public void fetchMusics(boolean favorite) {
+    public void fetchMusics(boolean favorite, String status, String difficulty) {
         String url = API_BASE_URL + "/musics";
 
+        List<String> params = new ArrayList<>();
+
         if (favorite) {
-            url += "?favorite=true";
+            params.add("favorite=true");
+        }
+        if (status != null) {
+            params.add("status=" + status);
+        }
+        if (difficulty != null) {
+            params.add("difficulty=" + difficulty);
+        }
+        if (!params.isEmpty()) {
+            url += "?" + String.join("&", params);
         }
 
         Log.d("GuitarAPI", "fetching musics");
@@ -167,7 +180,7 @@ public class GuitarAPI {
                 url, body,
                 response -> {
                     Log.d("GuitarAPI", "datas received : " + response);
-                    fetchMusics(inFavorite);
+                    fetchMusics(inFavorite, null, null);
                     liveData.setValue(this);
                 }, error -> {
             if (error.networkResponse != null) {
@@ -189,17 +202,17 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
-    public void patchMusicComment(int id, String comment) {
-        String url = API_BASE_URL + "/music/" + id + "/comment";
+    public void patchMusic(int id, String field, String value) {
+        String url = API_BASE_URL + "/music/" + id + "/" + field;
 
         JSONObject body = new JSONObject();
         try {
-            body.put("comment", comment);
+            body.put(field, value);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        Log.d("GuitarAPI", "patching music comment " + url);
+        Log.d("GuitarAPI", "patching music " + url);
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.PATCH,
                 url, body,
                 response -> {
@@ -214,15 +227,15 @@ public class GuitarAPI {
                 Log.e("GuitarAPI", error.toString());
             }
         }
-        ){
+        ) {
             @Override
-            public Map<String, String> getHeaders () {
+            public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<>();
                 headers.put("Content-Type", "application/merge-patch+json");
                 headers.put("Accept", "application/json");
                 return headers;
             }
-        } ;
+        };
         requestQueue.add(request);
     }
 }
