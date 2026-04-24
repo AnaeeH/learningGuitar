@@ -14,6 +14,8 @@ COPY . .
 
 ENV APP_ENV=prod
 
+RUN mkdir -p var/cache var/log && chmod -R 777 var/cache var/log
+
 RUN composer install --no-dev --optimize-autoloader
 
 RUN a2enmod rewrite
