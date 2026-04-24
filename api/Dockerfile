@@ -16,7 +16,11 @@ ENV APP_ENV=prod
 
 RUN composer install --no-dev --optimize-autoloader
 
-RUN mkdir -p var/cache var/log && chmod -R 777 var/cache var/log
+RUN mkdir -p var/cache var/log \
+    && chown -R www-data:www-data var/ \
+    && chmod -R 775 var/
+
+RUN APP_ENV=prod php bin/console cache:warmup
 
 RUN a2enmod rewrite
 
