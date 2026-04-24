@@ -1,7 +1,0 @@
-[build]
-builder = "nixpacks"
-buildCommand = "cd learningGuitar && composer install --no-dev --optimize-autoloader"
-
-[deploy]
-startCommand = "cd learningGuitar && php -S 0.0.0.0:$PORT -t public/"
-healthcheckPath = "/"
