@@ -12,6 +12,8 @@ WORKDIR /var/www/html
 
 COPY . .
 
+ENV APP_ENV=prod
+
 RUN composer install --no-dev --optimize-autoloader
 
 RUN a2enmod rewrite
