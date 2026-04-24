@@ -28,7 +28,7 @@ import androidx.lifecycle.Observer;
 import androidx.appcompat.app.AlertDialog;
 
 public class GuitarAPI {
-    public static final String API_BASE_URL = "http://192.168.1.26:8000/api";
+    public static final String API_BASE_URL = "https://guitarapi-yl09.onrender.com/api";
 
     public static JSONArray dataChords = null;
     public static JSONArray dataSongs = null;
