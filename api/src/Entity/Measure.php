@@ -7,6 +7,7 @@ use App\Repository\MeasureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MeasureRepository::class)]
@@ -30,6 +31,14 @@ class Measure
     #[ORM\Column(length: 32, nullable: true, name: 'mea_time_signature')]
     #[Groups(['music:partition', 'music:tablature'])]
     private ?string $timeSignature = null;
+
+    #[ORM\Column(name: 'mea_repeat_start', options: ['default' => false])]
+    #[Groups(['music:partition', 'music:tablature'])]
+    private bool $repeatStart = false;
+
+    #[ORM\Column(name: 'mea_repeat_end', options: ['default' => false])]
+    #[Groups(['music:partition', 'music:tablature'])]
+    private bool $repeatEnd = false;
 
     #[ORM\ManyToOne(inversedBy: 'measures')]
     #[ORM\JoinColumn(name: 'mea_mus_id', referencedColumnName: 'mus_id')]
@@ -92,6 +101,31 @@ class Measure
 
         return $this;
     }
+
+    public function getRepeatStart(): bool
+    {
+        return $this->repeatStart;
+    }
+
+    public function setRepeatStart(bool $repeatStart): static
+    {
+        $this->repeatStart = $repeatStart;
+
+        return $this;
+    }
+
+    public function getRepeatEnd(): bool
+    {
+        return $this->repeatEnd;
+    }
+
+    public function setRepeatEnd(bool $repeatEnd): static
+    {
+        $this->repeatEnd = $repeatEnd;
+        
+        return $this;
+    }
+
 
     public function getMusic(): ?Music
     {
