@@ -157,6 +157,15 @@ class MusicProcessor implements ProcessorInterface
                 $currentStaves = (int) $stavesNode;
             }
 
+            foreach ($measureNode->barline as $barline) {
+                $direction = (string) $barline->repeat['direction'];
+                if ($direction === 'forward') {
+                    $measure->setRepeatStart(true);
+                } elseif ($direction === 'backward') {
+                    $measure->setRepeatEnd(true);
+                }
+            }
+
             $this->em->persist($measure);
 
             $staves = (int) $measureNode->attributes->staves;
