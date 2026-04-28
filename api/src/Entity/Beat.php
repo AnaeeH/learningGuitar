@@ -45,6 +45,10 @@ class Beat
     #[Groups(['music:partition', 'music:tablature'])]
     private ?string $type;
 
+    #[ORM\Column(name: 'bea_grace', options: ['default' => false])]
+    #[Groups(['music:partition', 'music:tablature'])]
+    private bool $grace = false;
+
     #[ORM\Column(name: 'bea_dot')]
     #[Groups(['music:partition', 'music:tablature'])]
     private ?bool $dot = false;
@@ -158,6 +162,18 @@ class Beat
     public function setType(string $type): static
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getGrace(): ?bool
+    {
+        return $this->grace;
+    }
+
+    public function setGrace(?bool $grace): static
+    {
+        $this->grace = $grace;
 
         return $this;
     }
