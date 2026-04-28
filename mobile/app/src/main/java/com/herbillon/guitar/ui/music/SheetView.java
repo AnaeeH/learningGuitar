@@ -121,6 +121,13 @@ public class SheetView extends View {
         invalidate();
     }
 
+    public void setMeasures(List<Measure> measures) {
+        this.measures = measures;
+        this.nbMeasures = measures.size();
+        requestLayout();
+        invalidate();
+    }
+
     public float getMeasureWidth() {
         return measureWidth;
     }

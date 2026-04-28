@@ -14,23 +14,34 @@ import androidx.fragment.app.Fragment;
 
 import com.herbillon.guitar.model.Measure;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractMusicFragment extends Fragment {
 
+    // Music
     protected int tempo;
     protected int time1;
     protected int time2;
     protected List<Measure> measures;
     protected boolean hasPickupMeasure;
 
+    // Riff
+    protected boolean isRiff = false;
+    private int repeatStartIndex = -1;
+    private int repeatEndIndex = -1;
+    private boolean repeatAppended = false;
+
+    // Animation
     private ValueAnimator scrollAnimator;
     private float scrollPosition = 0f;
     private float cursorOffsetPx = 0f;
     private boolean isPlaying = false;
+    private boolean isStopping = false;
     private long totalDurationMs = 0;
     private String totalDurationFormatted = "0:00";
 
+    // Getter
     protected abstract HorizontalScrollView getScrollView();
     protected abstract SheetView getSheetView();
     protected abstract View getBtnPlay();
@@ -39,7 +50,6 @@ public abstract class AbstractMusicFragment extends Fragment {
     protected abstract SeekBar getSeekBar();
     protected abstract TextView getTextDuration();
     protected abstract View getPlaybackCursor();
-
 
     private float getTotalScrollable() {
         int total = measures.size() + (hasPickupMeasure ? 1 : 0);
@@ -142,12 +152,44 @@ public abstract class AbstractMusicFragment extends Fragment {
             updateProgress(scrollPosition / totalScrollable);
         });
 
+        // Riff
+        scrollAnimator.addUpdateListener(anim -> {
+            scrollPosition = (float) anim.getAnimatedValue();
+            getScrollView().scrollTo((int) scrollPosition, 0);
+            updateProgress(scrollPosition / getTotalScrollable());
+
+            if (isRiff && !repeatAppended) {
+                float lastMeasureStart = (measures.size() - 1) * getSheetView().getMeasureWidth();
+                if (scrollPosition >= lastMeasureStart) {
+                    repeatAppended = true;
+                    appendRepeatMeasures();
+                }
+            }
+        });
+        scrollAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (isStopping) {
+                    isStopping = false;
+                    return;
+                }
+                if (isPlaying && isRiff) {
+                    appendRepeatMeasures();
+                    startScroll();
+                } else {
+                    isPlaying = false;
+                    ((Button) getBtnPlay()).setText("▶");
+                }
+            }
+        });
+
         scrollAnimator.start();
         isPlaying = true;
     }
 
     protected void stopScroll() {
         if (scrollAnimator != null) {
+            isStopping = true;
             scrollAnimator.cancel();
             scrollAnimator = null;
         }
@@ -159,4 +201,23 @@ public abstract class AbstractMusicFragment extends Fragment {
         super.onPause();
         stopScroll();
     }
+
+    // Riff
+    protected void findRepeatBounds() {
+        for (int i = 0; i < measures.size(); i++) {
+            if (measures.get(i).repeatStart) repeatStartIndex = i;
+            if (measures.get(i).repeatEnd) repeatEndIndex = i;
+        }
+    }
+
+    private void appendRepeatMeasures() {
+        if (repeatStartIndex == -1 || repeatEndIndex == -1) return;
+        List<Measure> toAdd = measures.subList(repeatStartIndex, repeatEndIndex + 1);
+        measures.addAll(new ArrayList<>(toAdd));
+        getSheetView().setMeasures(measures);
+        getSheetView().invalidate();
+        calculateTotalDuration();
+        repeatAppended = false;
+    }
+
 }

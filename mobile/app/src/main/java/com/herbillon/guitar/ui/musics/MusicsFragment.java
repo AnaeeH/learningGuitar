@@ -43,8 +43,6 @@ import java.util.Map;
 public class MusicsFragment extends Fragment implements Observer, Refreshable {
     private FragmentMusicsBinding binding;
     private GuitarAPI guitarAPI;
-    private Map<Integer, String> statusMapping;
-    private Map<Integer, String> difficultyMapping;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -61,6 +59,7 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
 
         ChipGroup.OnCheckedStateChangeListener listener = (group, checkedIds) -> onRefresh();
         binding.chipGroupFavorite.setOnCheckedStateChangeListener(listener);
+        binding.chipGroupRiff.setOnCheckedStateChangeListener(listener);
 
         binding.searchInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -144,11 +143,13 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
     private void refreshUI(List<Music> musics) {
         if (musics == null){ return; }
 
-        int selectedId = binding.chipGroupFavorite.getCheckedChipId();
-        boolean inFavorite = selectedId == binding.chipFavorite.getId();
+        int selectedIdFavorite = binding.chipGroupFavorite.getCheckedChipId();
+        int selectedIdRiff = binding.chipGroupRiff.getCheckedChipId();
+        boolean inFavorite = selectedIdFavorite == binding.chipFavorite.getId();
+        boolean inRiff = selectedIdRiff == binding.chipRiff.getId();
         MusicAdapter adapter = new MusicAdapter(
                 musics,
-                (music) -> guitarAPI.patchMusicFavorite(music.getId(), music.getFavorite(), inFavorite),
+                (music) -> guitarAPI.patchMusicFavorite(music.getId(), music.getFavorite(), inFavorite, inRiff),
                 (music)  -> {
                     Bundle bundle = new Bundle();
                     bundle.putInt("musicId", music.getId());
@@ -175,11 +176,13 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
 
     @Override
     public void onRefresh() {
-        int selectedId = binding.chipGroupFavorite.getCheckedChipId();
-        boolean favorite = selectedId == binding.chipFavorite.getId();
+        int selectedIdFavorite = binding.chipGroupFavorite.getCheckedChipId();
+        int selectedIdRiff = binding.chipGroupRiff.getCheckedChipId();
+        boolean favorite = selectedIdFavorite == binding.chipFavorite.getId();
+        boolean riff = selectedIdRiff == binding.chipRiff.getId();
         String status = getSpinnerValue(binding.spinnerStatus, MusicConstants.STATUS_VALUES);
         String difficulty = getSpinnerValue(binding.spinnerDifficulty, MusicConstants.DIFFICULTY_VALUES);
 
-        guitarAPI.fetchMusics(favorite, status, difficulty);
+        guitarAPI.fetchMusics(favorite, riff, status, difficulty);
     }
 }

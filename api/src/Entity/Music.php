@@ -23,8 +23,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\HttpFoundation\File\File;
 
 #[ApiFilter(SearchFilter::class, properties: [
-    'title'    => 'ipartial', // /api/musics?title=SanFran
-    'favorite' => 'exact', 
+    'title'      => 'ipartial', // /api/musics?title=SanFran
+    'favorite'   => 'exact', 
+    'riff'       => 'exact', 
     'status'     => 'exact',  
     'difficulty' => 'exact', 
 ])]

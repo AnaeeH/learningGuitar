@@ -28,14 +28,13 @@ import androidx.lifecycle.Observer;
 import androidx.appcompat.app.AlertDialog;
 
 public class GuitarAPI {
-    public static final String API_BASE_URL = "https://guitarapi-yl09.onrender.com/api";
+    //public static final String API_BASE_URL = "https://guitarapi-yl09.onrender.com/api";
+    public static final String API_BASE_URL = "http://192.168.1.26:8000/api";
 
     public static JSONArray dataChords = null;
     public static JSONArray dataSongs = null;
     public static JSONObject dataSong = null;
     public static JSONObject dataTablature = null;
-    private final Handler handler = new Handler();
-    private Runnable updateRunnable;
 
     private static RequestQueue requestQueue;
     private final MutableLiveData<GuitarAPI> liveData = new MutableLiveData<>();
@@ -83,13 +82,16 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
-    public void fetchMusics(boolean favorite, String status, String difficulty) {
+    public void fetchMusics(boolean favorite, boolean riff, String status, String difficulty) {
         String url = API_BASE_URL + "/musics";
 
         List<String> params = new ArrayList<>();
 
         if (favorite) {
             params.add("favorite=true");
+        }
+        if (riff) {
+            params.add("riff=true");
         }
         if (status != null) {
             params.add("status=" + status);
@@ -165,7 +167,7 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
-    public void patchMusicFavorite(int id, boolean favorite, boolean inFavorite) {
+    public void patchMusicFavorite(int id, boolean favorite, boolean inFavorite, boolean inRiff) {
         String url = API_BASE_URL + "/music/" + id + "/favorite";
 
         JSONObject body = new JSONObject();
@@ -180,7 +182,7 @@ public class GuitarAPI {
                 url, body,
                 response -> {
                     Log.d("GuitarAPI", "datas received : " + response);
-                    fetchMusics(inFavorite, null, null);
+                    fetchMusics(inFavorite, inRiff,null, null);
                     liveData.setValue(this);
                 }, error -> {
             if (error.networkResponse != null) {

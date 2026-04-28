@@ -19,6 +19,8 @@ public class MusicParser {
             JSONObject mObj = measuresArray.getJSONObject(i);
             Measure measure = new Measure();
             measure.numero = mObj.getInt("numero");
+            measure.repeatStart = mObj.getBoolean("repeatStart");
+            measure.repeatEnd = mObj.getBoolean("repeatEnd");
             measure.beats = new ArrayList<>();
 
             JSONArray beatsArray = mObj.getJSONArray("beats");

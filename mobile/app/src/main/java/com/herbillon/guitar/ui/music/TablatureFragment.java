@@ -55,9 +55,12 @@ public class TablatureFragment extends AbstractMusicFragment implements Observer
             measures = MusicParser.parseMeasures(GuitarAPI.dataTablature);
             tempo = GuitarAPI.dataTablature.getInt("tempo");
             String timeSignature = GuitarAPI.dataTablature.getString("time_signature");
+            isRiff = GuitarAPI.dataTablature.getBoolean("riff");
             time1 = Integer.parseInt(timeSignature.split("/")[0]);
             time2 = Integer.parseInt(timeSignature.split("/")[1]);
             GuitarAPI.dataTablature = null;
+
+            findRepeatBounds();
 
             Log.d("Tablature", measures.size() + " mesures reçues");
 
