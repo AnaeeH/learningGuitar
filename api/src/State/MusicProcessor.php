@@ -198,6 +198,9 @@ class MusicProcessor implements ProcessorInterface
             $isChord  = isset($child->chord);
             $isRest   = isset($child->rest);
             $duration = (int) $child->duration;
+            $hammerOn = isset($child->notations->{'hammer-on'});
+            $pullOff  = isset($child->notations->{'pull-off'});
+            $isGrace  = isset($child->grace);       
 
             if (!isset($positionByVoice[$voice])) {
                 $positionByVoice[$voice]     = 0;
@@ -210,6 +213,10 @@ class MusicProcessor implements ProcessorInterface
                     $isTied = true;
                     break;
                 }
+            }
+            
+            if ($isGrace) {
+                $isTied = true;
             }
 
             $hasTablature = isset($child->notations->technical->string);
@@ -228,6 +235,8 @@ class MusicProcessor implements ProcessorInterface
                 $beat->setIsRest($isRest);
                 $beat->setTied($isTied);
                 $beat->setPosition($position);
+                $beat->setHammerOn($hammerOn);
+                $beat->setPullOff($pullOff);
 
                 if (!$isRest) {
                     $beat->setPitchStep((string) $child->pitch->step);
@@ -251,7 +260,7 @@ class MusicProcessor implements ProcessorInterface
 
                 $staff1Beats[] = $beat;
 
-                if (!$isChord) {
+                if (!$isChord && !$isGrace) {
                     $lastPositionByVoice[$voice] = $positionByVoice[$voice];
                     $positionByVoice[$voice] += $duration;
                 }
@@ -261,6 +270,8 @@ class MusicProcessor implements ProcessorInterface
             // -------------------------------------------------------
             // STAFF 2 — cherche le beat correspondant et complète
             // -------------------------------------------------------
+            if ($isGrace) continue;
+            
             if (!$hasTablature) {
                 // Pas d'infos tablature → rien à compléter
                 if (!$isChord) {
