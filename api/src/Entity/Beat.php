@@ -45,9 +45,13 @@ class Beat
     #[Groups(['music:partition', 'music:tablature'])]
     private ?string $type;
 
-    #[ORM\Column(name: 'bea_grace', options: ['default' => false])]
+    #[ORM\Column(name: 'bea_hammer_on', options: ['default' => false])]
     #[Groups(['music:partition', 'music:tablature'])]
-    private bool $grace = false;
+    private bool $hammerOn = false;
+
+    #[ORM\Column(name: 'bea_pull_off', options: ['default' => false])]
+    #[Groups(['music:partition', 'music:tablature'])]
+    private bool $pullOff = false;
 
     #[ORM\Column(name: 'bea_dot')]
     #[Groups(['music:partition', 'music:tablature'])]
@@ -166,14 +170,26 @@ class Beat
         return $this;
     }
 
-    public function getGrace(): ?bool
+    public function getHammerOn(): ?bool
     {
-        return $this->grace;
+        return $this->hammerOn;
     }
 
-    public function setGrace(?bool $grace): static
+    public function setHammerOn(?bool $hammerOn): static
     {
-        $this->grace = $grace;
+        $this->hammerOn = $hammerOn;
+
+        return $this;
+    }
+
+    public function getPullOff(): ?bool
+    {
+        return $this->pullOff;
+    }
+
+    public function setPullOff(?bool $pullOff): static
+    {
+        $this->pullOff = $pullOff;
 
         return $this;
     }
