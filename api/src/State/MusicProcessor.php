@@ -269,9 +269,7 @@ class MusicProcessor implements ProcessorInterface
 
             // -------------------------------------------------------
             // STAFF 2 — cherche le beat correspondant et complète
-            // -------------------------------------------------------
-            if ($isGrace) continue;
-            
+            // -------------------------------------------------------        
             if (!$hasTablature) {
                 // Pas d'infos tablature → rien à compléter
                 if (!$isChord) {

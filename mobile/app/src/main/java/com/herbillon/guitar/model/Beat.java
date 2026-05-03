@@ -7,6 +7,8 @@ public class Beat {
     public String type;
     public boolean dot;
     public boolean tied;
+    public boolean hammerOn;
+    public boolean pullOff;
 
     // Partition
     public String pitchStep;

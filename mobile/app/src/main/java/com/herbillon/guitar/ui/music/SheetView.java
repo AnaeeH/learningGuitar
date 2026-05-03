@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
@@ -203,9 +204,12 @@ public class SheetView extends View {
             // Regroup beats by position
             Map<Integer, List<Beat>> beatsByPosition = new LinkedHashMap<>();
             for (Beat beat : measure.beats) {
-                if (beat.isRest || beat.string == -1) continue;
+                if (beat.isRest) continue;
+                if (beat.string == -1 && !(beat.tied && beat.hammerOn)) continue;
                 beatsByPosition.computeIfAbsent(beat.position, k -> new ArrayList<>()).add(beat);
             }
+
+            Beat lastHammerBeat = null;
 
             for (Map.Entry<Integer, List<Beat>> entry : beatsByPosition.entrySet()) {
                 float x = xMeasureStart + ((float) entry.getKey() / measureDuration) * measureWidth;
@@ -215,9 +219,19 @@ public class SheetView extends View {
 
                 if (isChord) {
                     drawChord(canvas, x, yStart, lineSpacing, group, first.harmonyText, first.strumDirection);
+                    lastHammerBeat = null;
                 } else {
                     for (Beat beat : group) {
-                        drawSingleNote(canvas, x, yStart, lineSpacing, beat);
+                        drawSingleNote(canvas, x, yStart, lineSpacing, beat, lastHammerBeat);
+                        if (beat.hammerOn) {
+                            Log.d("SheetView", "drawSingleNote fret=" + beat.fret + " lastHammerBeat=" + (lastHammerBeat != null ? lastHammerBeat.fret : "null"));
+
+                            if (lastHammerBeat != null) {
+                                lastHammerBeat = null;
+                            } else {
+                                lastHammerBeat = beat;
+                            }
+                        }
                     }
                 }
             }
@@ -258,13 +272,23 @@ public class SheetView extends View {
         }
     }
 
-    private void drawSingleNote(Canvas canvas, float x, float yStart, float lineSpacing, Beat beat) {
+    private void drawSingleNote(Canvas canvas, float x, float yStart, float lineSpacing, Beat beat, Beat previousBeat) {
         if (beat.tied) return;
 
         float y = yStart + (beat.string - 1) * lineSpacing;
-        String label = String.valueOf(beat.fret);
-        float halfW = fretPaint.measureText(label) / 2f + lineSpacing * 0.25f;
-        float halfH = lineSpacing * 0.4f;
+
+        String label;
+        boolean showHammer = beat.hammerOn && previousBeat != null;
+        boolean showPullOff = beat.pullOff && previousBeat != null;
+
+        if (showHammer || showPullOff) {
+            label = "(" + previousBeat.fret + ") " + beat.fret;
+        } else {
+            label = String.valueOf(beat.fret);
+        }
+
+        float halfW = fretPaint.measureText(label) / 4f + lineSpacing * 0.25f;
+        float halfH = lineSpacing * 0.35f;
 
         // Note background
         Paint noteBg = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -280,6 +304,16 @@ public class SheetView extends View {
         noteText.setTextAlign(Paint.Align.CENTER);
         noteText.setTypeface(Typeface.DEFAULT_BOLD);
         canvas.drawText(label, x, y + fretPaint.getTextSize() / 4.8f, noteText);
+
+        // Hammer-on or Pull-off
+        if (showHammer || showPullOff) {
+            Paint hPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            hPaint.setColor(colorSecondary);
+            hPaint.setTextSize(fretPaint.getTextSize() / 2f);
+            hPaint.setTypeface(Typeface.DEFAULT_BOLD);
+            hPaint.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText(showHammer ? "H" : "P", x, y - halfH - 10f, hPaint);
+        }
     }
 
     private int totalMeasures() {
