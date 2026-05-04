@@ -12,7 +12,5 @@ public class GuitarApp extends Application {
         super.onCreate();
         guitarAPI = new GuitarAPI();
         guitarAPI.start(this);
-        guitarAPI.fetchChords("");
-        guitarAPI.fetchMusics(false, false, null, null);
     }
 }

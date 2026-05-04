@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.herbillon.guitar.GuitarApp;
+import com.herbillon.guitar.MainActivity;
 import com.herbillon.guitar.R;
 import com.herbillon.guitar.Refreshable;
 import com.herbillon.guitar.databinding.FragmentMusicBinding;
@@ -53,7 +54,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         View view = binding.getRoot();
 
         binding.scrollContent.setVisibility(View.GONE);
-        binding.progressBar.setVisibility(View.VISIBLE);
+        ((MainActivity) requireActivity()).showLoading();
         GuitarAPI.dataSong = null;
 
         composants.put("iconFavorite", binding.iconFavorite);
@@ -145,7 +146,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
 
     private void refreshUI() {
         if (music == null){ return; }
-        binding.progressBar.setVisibility(View.GONE);
+        ((MainActivity) requireActivity()).hideLoading();
         binding.scrollContent.setVisibility(View.VISIBLE);
 
         ((TextView) composants.get("BPM")).setText(music.getTempo() + " BPM · " + music.getTimeSignature());
@@ -195,7 +196,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
 
         if (GuitarAPI.dataSong == null) return;
         binding.scrollContent.setVisibility(View.GONE);
-        binding.progressBar.setVisibility(View.VISIBLE);
+        ((MainActivity) requireActivity()).showLoading();
         processDatas();
         refreshUI();
 
@@ -209,6 +210,8 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
 
     @Override
     public void onRefresh() {
+        binding.scrollContent.setVisibility(View.GONE);
+        ((MainActivity) requireActivity()).showLoading();
         guitarAPI.fetchMusic(musicId);
     }
 }

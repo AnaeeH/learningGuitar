@@ -22,6 +22,7 @@ import android.widget.Spinner;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.herbillon.guitar.GuitarApp;
+import com.herbillon.guitar.MainActivity;
 import com.herbillon.guitar.R;
 import com.herbillon.guitar.Refreshable;
 import com.herbillon.guitar.databinding.FragmentMusicsBinding;
@@ -48,6 +49,9 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentMusicsBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
+
+        binding.recyclerView.setVisibility(View.GONE);
+        ((MainActivity) requireActivity()).showLoading();
 
         GuitarApp app = (GuitarApp) requireActivity().getApplication();
         guitarAPI = app.guitarAPI;
@@ -142,6 +146,8 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
 
     private void refreshUI(List<Music> musics) {
         if (musics == null){ return; }
+        ((MainActivity) requireActivity()).hideLoading();
+        binding.recyclerView.setVisibility(View.VISIBLE);
 
         int selectedIdFavorite = binding.chipGroupFavorite.getCheckedChipId();
         int selectedIdRiff = binding.chipGroupRiff.getCheckedChipId();
@@ -170,12 +176,17 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
 
     @Override
     public void onChanged(Object o) {
+        binding.recyclerView.setVisibility(View.GONE);
+        ((MainActivity) requireActivity()).showLoading();
+
         String query = binding.searchInput.getText().toString();
         filterMusics(query);
     }
 
     @Override
     public void onRefresh() {
+        binding.recyclerView.setVisibility(View.GONE);
+        ((MainActivity) requireActivity()).showLoading();
         int selectedIdFavorite = binding.chipGroupFavorite.getCheckedChipId();
         int selectedIdRiff = binding.chipGroupRiff.getCheckedChipId();
         boolean favorite = selectedIdFavorite == binding.chipFavorite.getId();

@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.herbillon.guitar.GuitarApp;
+import com.herbillon.guitar.MainActivity;
 import com.herbillon.guitar.Refreshable;
 import com.herbillon.guitar.databinding.FragmentChordsBinding;
 import com.herbillon.guitar.model.Chord;
@@ -35,6 +36,9 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentChordsBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
+
+        binding.recyclerView.setVisibility(View.GONE);
+        ((MainActivity) requireActivity()).showLoading();
 
         GuitarApp app = (GuitarApp) requireActivity().getApplication();
         guitarAPI = app.guitarAPI;
@@ -100,6 +104,8 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
 
     private void refreshUI(List<Chord> chords) {
         if (chords == null){ return; }
+        ((MainActivity) requireActivity()).hideLoading();
+        binding.recyclerView.setVisibility(View.VISIBLE);
 
         ChordAdapter adapter = new ChordAdapter(chords);
         binding.recyclerView.setAdapter(adapter);
@@ -114,12 +120,17 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
 
     @Override
     public void onChanged(Object o) {
+        binding.recyclerView.setVisibility(View.GONE);
+        ((MainActivity) requireActivity()).showLoading();
+
         String query = binding.searchInput.getText().toString();
         filterChords(query);
     }
 
     @Override
     public void onRefresh() {
+        binding.recyclerView.setVisibility(View.GONE);
+        ((MainActivity) requireActivity()).showLoading();
         int selectedId = binding.chipGroup.getCheckedChipId();
         String filter = "";
         if (selectedId == binding.chipMajor.getId()) {

@@ -2,6 +2,8 @@ package com.herbillon.guitar;
 
 import android.graphics.Insets;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,12 +17,14 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
+    private ProgressBar globalProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        globalProgressBar = findViewById(R.id.globalProgressBar);
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
@@ -65,5 +69,20 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
+
+        GuitarApp app = (GuitarApp) getApplication();
+        showLoading();
+        app.guitarAPI.fetchChords("");
+        app.guitarAPI.fetchMusics(false, false, null, null);
+    }
+
+    public void showLoading() {
+        if (globalProgressBar != null)
+            globalProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    public void hideLoading() {
+        if (globalProgressBar != null)
+            globalProgressBar.setVisibility(View.GONE);
     }
 }

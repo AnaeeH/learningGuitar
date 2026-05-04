@@ -1,6 +1,7 @@
 package com.herbillon.guitar.ui.music;
 
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import androidx.lifecycle.Observer;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.herbillon.guitar.GuitarApp;
+import com.herbillon.guitar.MainActivity;
 import com.herbillon.guitar.R;
 import com.herbillon.guitar.databinding.FragmentTablatureBinding;
 import com.herbillon.guitar.model.Beat;
@@ -43,6 +45,8 @@ public class TablatureFragment extends AbstractMusicFragment implements Observer
         binding = FragmentTablatureBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
+        binding.horizontalScrollView.setVisibility(View.GONE);
+        ((MainActivity) requireActivity()).showLoading();
         GuitarAPI.dataTablature = null;
 
         guitarAPI.addObserver(this);
@@ -86,6 +90,9 @@ public class TablatureFragment extends AbstractMusicFragment implements Observer
 
     private void refreshUI() {
         if (measures == null) return;
+        ((MainActivity) requireActivity()).hideLoading();
+        binding.horizontalScrollView.setVisibility(View.VISIBLE);
+
         hasPickupMeasure = firstMeasureHasNotes();
         binding.sheetView.setHasPickupMeasure(hasPickupMeasure);
         SheetView sheetView = binding.sheetView;
@@ -125,6 +132,9 @@ public class TablatureFragment extends AbstractMusicFragment implements Observer
     @Override
     public void onChanged(Object o) {
         if (GuitarAPI.dataTablature == null) return;
+        binding.horizontalScrollView.setVisibility(View.GONE);
+        ((MainActivity) requireActivity()).showLoading();
+
         processDatas();
         requireActivity().runOnUiThread(() -> {
             calculateTotalDuration();
