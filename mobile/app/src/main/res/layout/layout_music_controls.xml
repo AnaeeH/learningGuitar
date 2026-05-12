@@ -81,7 +81,4 @@
         android:backgroundTint="@color/dark_background2"
         android:textColor="@color/dark_text"
         android:padding="0dp" />
-
-
-
 </LinearLayout>

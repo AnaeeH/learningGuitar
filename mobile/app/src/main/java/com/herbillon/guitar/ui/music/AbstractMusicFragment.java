@@ -20,6 +20,7 @@ import java.util.List;
 public abstract class AbstractMusicFragment extends Fragment {
 
     // Music
+    protected int currentTempo = -1;
     protected int tempo;
     protected int time1;
     protected int time2;
@@ -50,6 +51,10 @@ public abstract class AbstractMusicFragment extends Fragment {
     protected abstract SeekBar getSeekBar();
     protected abstract TextView getTextDuration();
     protected abstract View getPlaybackCursor();
+    protected abstract View getBtnSpeedDown();
+    protected abstract View getBtnSpeedUp();
+    protected abstract TextView getTextSpeed();
+    protected abstract TextView getTextTempo();
 
     private float getTotalScrollable() {
         int total = measures.size() + (hasPickupMeasure ? 1 : 0);
@@ -67,7 +72,7 @@ public abstract class AbstractMusicFragment extends Fragment {
     }
 
     protected void calculateTotalDuration() {
-        float secondsPerMeasure = time1 * (60f / tempo);
+        float secondsPerMeasure = time1 * (60f / currentTempo);
         int total = measures.size() + (hasPickupMeasure ? 1 : 0);
         int totalSeconds = (int) (secondsPerMeasure * total);
         totalDurationMs = totalSeconds * 1000L;
@@ -77,6 +82,7 @@ public abstract class AbstractMusicFragment extends Fragment {
     protected void setupControls() {
         getSeekBar().setMax(100);
         updateProgress(0f);
+        currentTempo = tempo;
 
         getPlaybackCursor().post(() -> {
             cursorOffsetPx = getScrollView().getWidth() / 3.5f;
@@ -96,6 +102,9 @@ public abstract class AbstractMusicFragment extends Fragment {
 
         getBtnSkipBack().setOnClickListener(v -> skipSeconds(-10));
         getBtnSkipForward().setOnClickListener(v -> skipSeconds(10));
+
+        getBtnSpeedDown().setOnClickListener(v -> changeTempo(-5));
+        getBtnSpeedUp().setOnClickListener(v -> changeTempo(5));
 
         getSeekBar().setOnSeekBarChangeListener(buildSeekBarListener());
     }
@@ -132,6 +141,18 @@ public abstract class AbstractMusicFragment extends Fragment {
         getScrollView().scrollTo((int) scrollPosition, 0);
         updateProgress(scrollPosition / totalPixels);
 
+        if (isPlaying) {
+            stopScroll();
+            startScroll();
+        }
+    }
+
+    private void changeTempo(int bpm) {
+        currentTempo += bpm;
+        getTextTempo().setText(currentTempo + " BPM · " + time1 + "/" + time2);
+        getTextSpeed().setText(Math.round((double) currentTempo / tempo * 100) + "%");
+
+        calculateTotalDuration();
         if (isPlaying) {
             stopScroll();
             startScroll();

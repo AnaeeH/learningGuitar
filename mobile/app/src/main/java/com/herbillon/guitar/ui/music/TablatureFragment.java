@@ -188,4 +188,26 @@ public class TablatureFragment extends AbstractMusicFragment implements Observer
     protected View getPlaybackCursor() {
         return binding.playbackCursor;
     }
+
+    @Override
+    protected View getBtnSpeedDown() {
+        return binding.musicControls.btnSpeedDown;
+    }
+
+    @Override
+    protected View getBtnSpeedUp() {
+        return binding.musicControls.btnSpeedUp;
+    }
+
+    @Override
+    protected TextView getTextSpeed() {
+        return binding.musicControls.textSpeed;
+    }
+
+    @Override
+    protected TextView getTextTempo() {
+        MaterialToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        MenuItem tempoItem = toolbar.getMenu().findItem(R.id.action_tempo);
+        return tempoItem.getActionView().findViewById(R.id.textTempo);
+    }
 }
