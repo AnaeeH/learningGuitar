@@ -1,13 +1,13 @@
 package com.herbillon.guitar.ui.music;
 
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.HorizontalScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -98,6 +98,7 @@ public class TablatureFragment extends AbstractMusicFragment implements Observer
         SheetView sheetView = binding.sheetView;
         sheetView.setMusique(measures, measures.size(), time1, time2, 6);
         setupControls();
+        loadYoutube("8Z0vr5nV8Io", 14300);
     }
 
     @Override
@@ -147,6 +148,11 @@ public class TablatureFragment extends AbstractMusicFragment implements Observer
         super.onDestroyView();
         guitarAPI.removeObserver(this);
         binding = null;
+    }
+
+    @Override
+    protected WebView getYoutubeWebView() {
+        return binding.youtubeWebView;
     }
 
     @Override

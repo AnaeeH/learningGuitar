@@ -3,8 +3,14 @@ package com.herbillon.guitar.ui.music;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.SeekBar;
@@ -43,6 +49,7 @@ public abstract class AbstractMusicFragment extends Fragment {
     private String totalDurationFormatted = "0:00";
 
     // Getter
+    protected abstract WebView getYoutubeWebView();
     protected abstract HorizontalScrollView getScrollView();
     protected abstract SheetView getSheetView();
     protected abstract View getBtnPlay();
@@ -83,6 +90,7 @@ public abstract class AbstractMusicFragment extends Fragment {
         getSeekBar().setMax(100);
         updateProgress(0f);
         currentTempo = tempo;
+        setupYoutube();
 
         getPlaybackCursor().post(() -> {
             cursorOffsetPx = getScrollView().getWidth() / 3.5f;
@@ -107,6 +115,14 @@ public abstract class AbstractMusicFragment extends Fragment {
         getBtnSpeedUp().setOnClickListener(v -> changeTempo(5));
 
         getSeekBar().setOnSeekBarChangeListener(buildSeekBarListener());
+    }
+
+    private void setupYoutube() {
+        WebSettings settings = getYoutubeWebView().getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true);
+        settings.setMediaPlaybackRequiresUserGesture(false);
+        getYoutubeWebView().setWebChromeClient(new WebChromeClient());
     }
 
     private SeekBar.OnSeekBarChangeListener buildSeekBarListener() {
@@ -206,6 +222,7 @@ public abstract class AbstractMusicFragment extends Fragment {
 
         scrollAnimator.start();
         isPlaying = true;
+        playYoutube();
     }
 
     protected void stopScroll() {
@@ -215,6 +232,7 @@ public abstract class AbstractMusicFragment extends Fragment {
             scrollAnimator = null;
         }
         isPlaying = false;
+        pauseYoutube();
     }
 
     @Override
@@ -222,6 +240,45 @@ public abstract class AbstractMusicFragment extends Fragment {
         super.onPause();
         stopScroll();
     }
+
+    protected void loadYoutube(String videoId, int startMs) {
+        double startExact = startMs / 1000.0;
+
+        String html = "<html>"
+                + "<head><meta name='referrer' content='strict-origin'></head>"
+                + "<body><iframe src='https://www.youtube.com/embed/" + videoId
+                + "?autoplay=0&start=" + (startMs / 1000)
+                + "&controls=1&playsinline=1&enablejsapi=1' "
+                + "</iframe></body></html>";
+
+        getYoutubeWebView().setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                new Handler(Looper.getMainLooper()).postDelayed(() ->
+                        getYoutubeWebView().evaluateJavascript(
+                                "document.querySelector('iframe').contentWindow.postMessage(" +
+                                        "'{\"event\":\"command\",\"func\":\"seekTo\",\"args\":[" + startExact + ", true]}', '*');",
+                                null
+                        ), 1500);
+            }
+        });
+
+        getYoutubeWebView().loadDataWithBaseURL("https://com.herbillon.guitar",
+                html, "text/html", "utf-8", null);
+    }
+
+    private void playYoutube() {
+        getYoutubeWebView().evaluateJavascript(
+                "document.querySelector('iframe').contentWindow.postMessage(" +
+                        "'{\"event\":\"command\",\"func\":\"playVideo\",\"args\":\"\"}', '*');", null);
+    }
+
+    private void pauseYoutube() {
+        getYoutubeWebView().evaluateJavascript(
+                "document.querySelector('iframe').contentWindow.postMessage(" +
+                        "'{\"event\":\"command\",\"func\":\"pauseVideo\",\"args\":\"\"}', '*');", null);
+    }
+
 
     // Riff
     protected void findRepeatBounds() {
