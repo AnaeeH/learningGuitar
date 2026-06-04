@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Beat;
 use App\Entity\Music;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,28 +17,49 @@ class MusicRepository extends ServiceEntityRepository
         parent::__construct($registry, Music::class);
     }
 
-    //    /**
-    //     * @return Music[] Returns an array of Music objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('m.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findAllOrderedByTitle(): array
+    {
+        return $this->createQueryBuilder('m')
+            ->orderBy('m.title', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Music
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findAllOrderedByLastPlayed(): array
+    {
+        return $this->createQueryBuilder('m')
+            ->orderBy('m.last_played_at', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findLastPlayed(): ?Music
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.last_played_at IS NOT NULL')
+            ->orderBy('m.last_played_at', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findDistinctChordsByMusic(int $musicId): array
+    {
+        $result = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select('b.harmonyText, MIN(mea.numero) as firstMeasure, MIN(b.position) as firstPosition')
+            ->from(Beat::class, 'b')
+            ->join('b.measure', 'mea')
+            ->join('mea.music', 'mus')
+            ->where('mus.id = :musicId')
+            ->groupBy('b.harmonyText')
+            ->having('b.harmonyText IS NOT NULL')
+            ->orderBy('firstMeasure', 'ASC')
+            ->addOrderBy('firstPosition', 'ASC')
+            ->setParameter('musicId', $musicId)
+            ->getQuery()
+            ->getResult();
+
+        return array_column($result, 'harmonyText');
+    }
 }

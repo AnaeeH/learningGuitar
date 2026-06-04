@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
 use App\State\MusicProcessor;
 use App\State\MusicDeleteProcessor;
+use App\State\MusicProvider;
 use DateTime;
 use Vich\UploaderBundle\Mapping\Attribute as Vich;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -27,10 +28,10 @@ use Symfony\Component\Validator\Constraints\Date;
 
 #[ApiFilter(SearchFilter::class, properties: [
     'title'      => 'ipartial', // /api/musics?title=SanFran
-    'favorite'   => 'exact', 
-    'riff'       => 'exact', 
-    'status'     => 'exact',  
-    'difficulty' => 'exact', 
+    'favorite'   => 'exact',
+    'riff'       => 'exact',
+    'status'     => 'exact',
+    'difficulty' => 'exact',
 ])]
 #[ApiResource(
     paginationEnabled: true,
@@ -38,50 +39,75 @@ use Symfony\Component\Validator\Constraints\Date;
     normalizationContext: ['groups' => ['music:detail']],
     operations: [
         new GetCollection(
-            uriTemplate: '/musics',
+            uriTemplate: '/get/musics/title',
+            name: 'get_title',
+            provider: MusicProvider::class,
+            normalizationContext: ['groups' => ['music:read']]
+        ),
+        new GetCollection(
+            uriTemplate: '/get/musics/recent',
+            name: 'get_recent',
+            provider: MusicProvider::class,
             normalizationContext: ['groups' => ['music:read']]
         ),
         new Get(
-            uriTemplate: '/music/{id}',
+            uriTemplate: '/get/music/last-played',
+            name: 'get_last_played',
+            provider: MusicProvider::class,
+            normalizationContext: ['groups' => ['music:read']]
+        ),
+        new Get(
+            uriTemplate: '/get/music/{id}',
             normalizationContext: ['groups' => ['music:detail']]
         ),
         new Get(
-            uriTemplate: '/music/partition/{id}',
+            uriTemplate: '/get/music/{id}/chords',
+            name: 'get_chords',
+            provider: MusicProvider::class,
+            normalizationContext: ['groups' => ['music:chords']]
+        ),
+        new Get(
+            uriTemplate: '/get/music/{id}/partition',
             normalizationContext: ['groups' => ['music:detail', 'music:partition']]
         ),
         new Get(
-            uriTemplate: '/music/tablature/{id}',
+            uriTemplate: '/get/music/{id}/tablature',
             normalizationContext: ['groups' => ['music:detail', 'music:tablature']]
         ),
         new Post(
-            uriTemplate: '/music',
+            uriTemplate: '/post/music',
             inputFormats: ['multipart' => ['multipart/form-data']],
             processor: MusicProcessor::class,
             deserialize: false,
             denormalizationContext: ['groups' => ['music:write']]
         ),
         new Patch(
-            uriTemplate: '/music/{id}/favorite',
+            uriTemplate: '/patch/music/{id}/favorite',
             denormalizationContext: ['groups' => ['music:favorite']],
             normalizationContext: ['groups' => ['music:read']]
         ),
         new Patch(
-            uriTemplate: '/music/{id}/comment',
+            uriTemplate: '/patch/music/{id}/comment',
             denormalizationContext: ['groups' => ['music:comment']],
             normalizationContext: ['groups' => ['music:read']]
         ),
         new Patch(
-            uriTemplate: '/music/{id}/status',
-            denormalizationContext: ['groups' => ['music:status']],
+            uriTemplate: '/patch/music/{id}/progress',
+            denormalizationContext: ['groups' => ['music:progress']],
             normalizationContext: ['groups' => ['music:read']]
         ),
         new Patch(
-            uriTemplate: '/music/{id}/difficulty',
+            uriTemplate: '/patch/music/{id}/difficulty',
             denormalizationContext: ['groups' => ['music:difficulty']],
             normalizationContext: ['groups' => ['music:read']]
         ),
+        new Patch(
+            uriTemplate: '/patch/music/{id}/last-played',
+            denormalizationContext: ['groups' => ['music:last_played_at']],
+            normalizationContext: ['groups' => ['music:read']]
+        ),
         new Delete(
-            uriTemplate: '/music/{id}/delete',
+            uriTemplate: '/delete/music/{id}/delete',
             processor: MusicDeleteProcessor::class,
         )
     ]
@@ -131,7 +157,7 @@ class Music
 
     #[ORM\Column(type: 'smallint', nullable: false, name: 'mus_progress', options: ['default' => 0])]
     #[Assert\Range(min: 0, max: 100)]
-    #[Groups(['music:read', 'music:detail'])]
+    #[Groups(['music:read', 'music:progress', 'music:detail'])]
     private int $progress = 0;
 
     #[ORM\Column(type: 'string', length: 16, nullable: false, name: 'mus_difficulty', enumType: MusicDifficulty::class)]
@@ -153,6 +179,7 @@ class Music
     public ?File $audioFile = null;
 
     #[ORM\Column(nullable: true, name: 'mus_last_played_at')]
+     #[Groups(['music:last_played_at'])]
     private ?DateTime $last_played_at;
 
     /**
