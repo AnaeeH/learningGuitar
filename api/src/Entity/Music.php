@@ -18,9 +18,12 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
 use App\State\MusicProcessor;
 use App\State\MusicDeleteProcessor;
+use DateTime;
 use Vich\UploaderBundle\Mapping\Attribute as Vich;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Date;
 
 #[ApiFilter(SearchFilter::class, properties: [
     'title'      => 'ipartial', // /api/musics?title=SanFran
@@ -126,9 +129,10 @@ class Music
     #[Groups(['music:read', 'music:comment', 'music:detail'])]
     private ?string $comment = null;
 
-    #[ORM\Column(type: 'string', length: 16, nullable: false, name: 'mus_status', enumType: MusicStatus::class)]
-    #[Groups(['music:read', 'music:detail', 'music:status'])]
-    private ?MusicStatus $status = MusicStatus::TO_LEARN;
+    #[ORM\Column(type: 'smallint', nullable: false, name: 'mus_progress', options: ['default' => 0])]
+    #[Assert\Range(min: 0, max: 100)]
+    #[Groups(['music:read', 'music:detail'])]
+    private int $progress = 0;
 
     #[ORM\Column(type: 'string', length: 16, nullable: false, name: 'mus_difficulty', enumType: MusicDifficulty::class)]
     #[Groups(['music:read', 'music:detail', 'music:difficulty'])]
@@ -147,6 +151,9 @@ class Music
     #[Vich\UploadableField(mapping: 'music_audio', fileNameProperty: 'audioPath')]
     #[Groups(['music:write'])]
     public ?File $audioFile = null;
+
+    #[ORM\Column(nullable: true, name: 'mus_last_played_at')]
+    private ?DateTime $last_played_at;
 
     /**
      * @var Collection<int, Measure>
@@ -236,14 +243,14 @@ class Music
         return $this;
     }
 
-    public function getStatus(): ?MusicStatus
+    public function getProgress(): ?int
     {
-        return $this->status;
+        return $this->progress;
     }
 
-    public function setStatus(?MusicStatus $status): static
+    public function setProgress(?int $progress): static
     {
-        $this->status = $status;
+        $this->progress = $progress;
         return $this;
     }
 
@@ -355,6 +362,18 @@ class Music
     public function setVideo(?Video $video): static
     {
         $this->video = $video;
+
+        return $this;
+    }
+
+    public function getLastPlayedAt(): ?DateTime
+    {
+        return $this->last_played_at;
+    }
+
+    public function setLastPlayedAt(?DateTime $last_played_at): static
+    {
+        $this->last_played_at = $last_played_at;
 
         return $this;
     }

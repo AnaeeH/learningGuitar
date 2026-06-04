@@ -52,6 +52,7 @@ class MusicProcessor implements ProcessorInterface
 
         $riff = $request->request->get('riff', 'false');
         $music->setRiff(filter_var($riff, FILTER_VALIDATE_BOOLEAN));
+        $music->setLastPlayedAt(new \DateTime());
 
         $this->em->persist($music);
         $this->em->flush();
