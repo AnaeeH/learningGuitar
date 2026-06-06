@@ -16,6 +16,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\QueryParameter;
 use App\State\MusicProcessor;
 use App\State\MusicDeleteProcessor;
 use App\State\MusicProvider;
@@ -42,13 +43,19 @@ use Symfony\Component\Validator\Constraints\Date;
             uriTemplate: '/get/musics/title',
             name: 'get_title',
             provider: MusicProvider::class,
-            normalizationContext: ['groups' => ['music:read']]
+            normalizationContext: ['groups' => ['music:read']],
+            parameters: [
+                'status' => new QueryParameter(),
+            ]
         ),
         new GetCollection(
             uriTemplate: '/get/musics/recent',
             name: 'get_recent',
             provider: MusicProvider::class,
-            normalizationContext: ['groups' => ['music:read']]
+            normalizationContext: ['groups' => ['music:read']],
+            parameters: [
+                'status' => new QueryParameter(),
+            ]
         ),
         new Get(
             uriTemplate: '/get/music/last-played',
@@ -179,7 +186,7 @@ class Music
     public ?File $audioFile = null;
 
     #[ORM\Column(nullable: true, name: 'mus_last_played_at')]
-     #[Groups(['music:last_played_at'])]
+    #[Groups(['music:last_played_at'])]
     private ?DateTime $last_played_at;
 
     /**

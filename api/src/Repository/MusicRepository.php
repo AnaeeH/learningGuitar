@@ -17,20 +17,43 @@ class MusicRepository extends ServiceEntityRepository
         parent::__construct($registry, Music::class);
     }
 
-    public function findAllOrderedByTitle(): array
-    {
-        return $this->createQueryBuilder('m')
-            ->orderBy('m.title', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
+    public function findAllOrdered(
+        string $orderBy = 'recent',
+        ?bool $favorite = null,
+        ?bool $riff = null,
+        ?string $difficulty = null,
+        ?string $status = null
+    ): array {
+        $field = $orderBy === 'recent' ? 'm.last_played_at' : 'm.title';
 
-    public function findAllOrderedByLastPlayed(): array
-    {
-        return $this->createQueryBuilder('m')
-            ->orderBy('m.last_played_at', 'DESC')
-            ->getQuery()
-            ->getResult();
+        $queryBuilder = $this->createQueryBuilder('m')
+            ->orderBy($field, 'DESC');
+
+        if ($favorite !== null) {
+            $queryBuilder->andWhere('m.favorite = :favorite')
+                ->setParameter('favorite', $favorite);
+        }
+
+        if ($riff !== null) {
+            $queryBuilder->andWhere('m.riff = :riff')
+                ->setParameter('riff', $riff);
+        }
+
+        if ($difficulty !== null) {
+            $queryBuilder->andWhere('m.difficulty = :difficulty')
+                ->setParameter('difficulty', $difficulty);
+        }
+
+        if ($status !== null) {
+            match ($status) {
+                'to_learn' => $queryBuilder->andWhere('m.progress = 0'),
+                'learnt'   => $queryBuilder->andWhere('m.progress = 100'),
+                'learning' => $queryBuilder->andWhere('m.progress > 0')->andWhere('m.progress < 100'),
+                default    => null
+            };
+        }
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     public function findLastPlayed(): ?Music
