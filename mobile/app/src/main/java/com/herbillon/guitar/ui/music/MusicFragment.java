@@ -47,6 +47,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
     private GuitarAPI guitarAPI;
     private Music music;
     private int musicId;
+    private String musicChords;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -63,6 +64,8 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         composants.put("textRiff", binding.textRiff);
         composants.put("BPM", binding.textBpm);
         composants.put("comment", binding.textComment);
+        composants.put("titleChords", binding.titleChords);
+        composants.put("textChords", binding.textChords);
 
         GuitarApp app = (GuitarApp) requireActivity().getApplication();
         guitarAPI = app.guitarAPI;
@@ -73,6 +76,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         Log.d("MusicFragment", "fetching " + musicId);
         GuitarAPI.dataSong = null;
         guitarAPI.fetchMusic(musicId);
+        guitarAPI.fetchMusicChords(musicId);
 
         binding.btnTablature.setOnClickListener(v -> {
             if (music == null) return;
@@ -121,6 +125,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
 
     private void processDatas() {
         JSONObject datas = GuitarAPI.dataSong;
+        JSONArray datasChords = GuitarAPI.dataSongChords;
         if (datas == null) return;
 
         Log.d("MusicFragment", "fetching " + datas);
@@ -131,7 +136,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
                     datas.getString("artist"),
                     datas.getBoolean("favorite"),
                     datas.getString("difficulty"),
-                    datas.getString("status"),
+                    datas.getInt("progress"),
                     datas.getInt("tempo"),
                     datas.getString("time_signature"),
                     datas.optString("comment", null),
@@ -141,7 +146,21 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        if (datasChords == null) return;
+        try {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < datasChords.length(); i++) {
+                sb.append(datasChords.getString(i) + " ");
+            }
+            musicChords = sb.toString();
+            Log.d("MusicFragment", "fetching " + musicChords);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         GuitarAPI.dataSong = null;
+        GuitarAPI.dataSongChords = null;
     }
 
     private void refreshUI() {
@@ -180,6 +199,15 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
             ((ImageView) composants.get("iconRiff")).setVisibility(View.INVISIBLE);
             ((TextView) composants.get("textRiff")).setVisibility(View.INVISIBLE);
         }
+
+        if (musicChords == null || musicChords.isEmpty()){
+            ((TextView) composants.get("titleChords")).setVisibility(View.GONE);
+            ((TextView) composants.get("textChords")).setVisibility(View.GONE);
+        } else {
+            ((TextView) composants.get("titleChords")).setVisibility(View.VISIBLE);
+            ((TextView) composants.get("textChords")).setVisibility(View.VISIBLE);
+            ((TextView) composants.get("textChords")).setText(musicChords);
+        }
     }
 
     @Override
@@ -204,7 +232,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         binding.chipGroupDifficulty.setOnCheckedStateChangeListener(null);
         binding.chipGroupStatus.removeAllViews();
         binding.chipGroupDifficulty.removeAllViews();
-        setupChips(binding.chipGroupStatus, MusicConstants.STATUS_VALUES, music.getStatus());
+//        setupChips(binding.chipGroupStatus, MusicConstants.STATUS_VALUES, music.getStatus());
         setupChips(binding.chipGroupDifficulty, MusicConstants.DIFFICULTY_VALUES, music.getDifficulty());
     }
 
@@ -213,5 +241,6 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         binding.scrollContent.setVisibility(View.GONE);
         ((MainActivity) requireActivity()).showLoading();
         guitarAPI.fetchMusic(musicId);
+        guitarAPI.fetchMusicChords(musicId);
     }
 }

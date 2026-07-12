@@ -54,7 +54,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
     public void onBindViewHolder(@NonNull MusicAdapter.MusicViewHolder holder, int position) {
         Music music = musics.get(position);
         holder.title.setText(music.getTitle());
-        holder.artist.setText(music.getArtist());
+        holder.artist.setText(music.getArtist() + "  -  " + music.getProgress() + "%");
 
         switch (music.getDifficulty()) {
             case MusicConstants.DIFFICULTY_MEDIUM:

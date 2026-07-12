@@ -35,6 +35,7 @@ public class GuitarAPI {
     public static JSONArray dataChords = null;
     public static JSONArray dataSongs = null;
     public static JSONObject dataSong = null;
+    public static JSONArray dataSongChords = null;
     public static JSONObject dataTablature = null;
 
     private static RequestQueue requestQueue;
@@ -84,7 +85,7 @@ public class GuitarAPI {
     }
 
     public void fetchMusics(boolean favorite, boolean riff, String status, String difficulty) {
-        String url = API_BASE_URL + "/musics";
+        String url = API_BASE_URL + "/get/musics/recent";
 
         List<String> params = new ArrayList<>();
 
@@ -125,7 +126,7 @@ public class GuitarAPI {
     }
 
     public void fetchMusic(int id){
-        String url = API_BASE_URL + "/music/" + id;
+        String url = API_BASE_URL + "/get/music/" + id;
         Log.d("GuitarAPI", "fetching music");
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
                 url, null,
@@ -146,8 +147,30 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
+    public void fetchMusicChords(int id){
+        String url = API_BASE_URL + "/get/music/" + id + "/chords";
+        Log.d("GuitarAPI", "fetching music");
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,
+                url, null,
+                response -> {
+                    Log.d("GuitarAPI", "datas music : " + response);
+                    dataSongChords = response;
+                    liveData.setValue(this);
+                }, error -> Log.e("GuitarAPI", error.toString())
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+                return headers;
+            }
+        };
+        requestQueue.add(request);
+    }
+
     public void fetchTablature(int id){
-        String url = API_BASE_URL + "/music/tablature/" + id;
+        String url = API_BASE_URL + "/get/music/" + id + "/tablature";
         Log.d("GuitarAPI", "fetching tablature");
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
                 url, null,
@@ -169,7 +192,7 @@ public class GuitarAPI {
     }
 
     public void patchMusicFavorite(int id, boolean favorite, boolean inFavorite, boolean inRiff) {
-        String url = API_BASE_URL + "/music/" + id + "/favorite";
+        String url = API_BASE_URL + "/patch/music/" + id + "/favorite";
 
         JSONObject body = new JSONObject();
         try {
@@ -206,7 +229,7 @@ public class GuitarAPI {
     }
 
     public void patchMusic(int id, String field, String value) {
-        String url = API_BASE_URL + "/music/" + id + "/" + field;
+        String url = API_BASE_URL + "/patch/music/" + id + "/" + field;
 
         JSONObject body = new JSONObject();
         try {

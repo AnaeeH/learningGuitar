@@ -9,28 +9,28 @@ public class Music {
     private boolean favorite;
     private String comment;
     private String difficulty;
-    private String status;
+    private int progress;
 
     private int tempo;
     private String timeSignature;
     private boolean riff;
 
-    public Music(int id, String n, String a, boolean f, String d, String s){
+    public Music(int id, String n, String a, boolean f, String d, int p){
         this.id = id;
         this.title = n;
         this.favorite = f;
         this.artist = a;
         this.difficulty = d;
-        this.status = s;
+        this.progress = p;
     }
 
-    public Music(int id, String n, String a, boolean f, String d, String s, int t, String timeSig, String c, boolean r){
+    public Music(int id, String n, String a, boolean f, String d, int p, int t, String timeSig, String c, boolean r){
         this.id = id;
         this.title = n;
         this.favorite = f;
         this.artist = a;
         this.difficulty = d;
-        this.status = s;
+        this.progress = p;
 
         this.tempo = t;
         this.timeSignature = timeSig;
@@ -53,13 +53,20 @@ public class Music {
     public String getDifficulty() {
         return difficulty;
     }
-    public String getStatus() { return status; }
-
-    public int getTempo() { return tempo; }
+    public int getProgress() {
+        return progress;
+    }
+    public int getTempo() {
+        return tempo;
+    }
     public String getTimeSignature() {
         return timeSignature;
     }
-    public String getComment() { return comment; }
-    public boolean getRiff() { return riff; }
+    public String getComment() {
+        return comment;
+    }
+    public boolean getRiff() {
+        return riff;
+    }
 
 }

@@ -135,7 +135,7 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
                         music.getString("artist"),
                         music.getBoolean("favorite"),
                         music.getString("difficulty"),
-                        music.getString("status")
+                        music.getInt("progress")
                 ));
             }
         } catch (JSONException e) {

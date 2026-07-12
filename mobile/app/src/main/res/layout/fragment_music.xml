@@ -66,6 +66,22 @@
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/titleChords"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ACCORDS"
+                android:textColor="@color/dark_textSecondary"
+                android:textSize="12sp"
+                android:textAllCaps="true"
+                android:layout_marginTop="10dp" />
+
+            <TextView
+                android:id="@+id/textChords"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/dark_text"
+                android:textSize="12sp" />
 
             <TextView
                 android:layout_width="wrap_content"
