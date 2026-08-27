@@ -30,6 +30,8 @@ public abstract class AbstractMusicFragment extends Fragment {
     protected int tempo;
     protected int time1;
     protected int time2;
+    protected String videoId = null;
+    protected int startMs = -1;
     protected List<Measure> measures;
     protected boolean hasPickupMeasure;
 
@@ -223,6 +225,11 @@ public abstract class AbstractMusicFragment extends Fragment {
         scrollAnimator.start();
         isPlaying = true;
         playYoutube();
+
+//        long measureDurationMs = (long) (time1 * (60.0 / currentTempo) * 1000);
+//        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+//            if (isPlaying) playYoutube();
+//        }, measureDurationMs);
     }
 
     protected void stopScroll() {
@@ -241,36 +248,29 @@ public abstract class AbstractMusicFragment extends Fragment {
         stopScroll();
     }
 
-    protected void loadYoutube(String videoId, int startMs) {
+    protected void loadYoutube() {
         double startExact = startMs / 1000.0;
 
         String html = "<html>"
                 + "<head><meta name='referrer' content='strict-origin'></head>"
-                + "<body><iframe src='https://www.youtube.com/embed/" + videoId
-                + "?autoplay=0&start=" + (startMs / 1000)
-                + "&controls=1&playsinline=1&enablejsapi=1' "
-                + "</iframe></body></html>";
-
-        getYoutubeWebView().setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                new Handler(Looper.getMainLooper()).postDelayed(() ->
-                        getYoutubeWebView().evaluateJavascript(
-                                "document.querySelector('iframe').contentWindow.postMessage(" +
-                                        "'{\"event\":\"command\",\"func\":\"seekTo\",\"args\":[" + startExact + ", true]}', '*');",
-                                null
-                        ), 1500);
-            }
-        });
+                + "<body><iframe id='yt' src='https://www.youtube.com/embed/" + videoId
+                + "?autoplay=0"
+                + "&controls=1&playsinline=1&enablejsapi=1'>"
+                + "</iframe>"
+                + "</body></html>";
 
         getYoutubeWebView().loadDataWithBaseURL("https://com.herbillon.guitar",
                 html, "text/html", "utf-8", null);
     }
 
     private void playYoutube() {
+        double currentYtTime = startMs / 1000.0 + (scrollPosition / getTotalScrollable()) * (totalDurationMs / 1000.0);
+
         getYoutubeWebView().evaluateJavascript(
-                "document.querySelector('iframe').contentWindow.postMessage(" +
-                        "'{\"event\":\"command\",\"func\":\"playVideo\",\"args\":\"\"}', '*');", null);
+                "var f = document.querySelector('iframe');" +
+                        "f.contentWindow.postMessage('{\"event\":\"command\",\"func\":\"seekTo\",\"args\":[" + currentYtTime + ", true]}', '*');" +
+                        "f.contentWindow.postMessage('{\"event\":\"command\",\"func\":\"playVideo\",\"args\":\"\"}', '*');",
+                null);
     }
 
     private void pauseYoutube() {

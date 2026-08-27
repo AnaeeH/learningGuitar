@@ -31,7 +31,6 @@ public class GuitarAPI {
     public static final String API_BASE_URL = "https://guitarapi-yl09.onrender.com/api";
     //static final String API_BASE_URL = "http://192.168.1.26:8000/api";
 
-
     public static JSONArray dataChords = null;
     public static JSONArray dataSongs = null;
     public static JSONObject dataSong = null;
@@ -53,6 +52,16 @@ public class GuitarAPI {
         requestQueue = Volley.newRequestQueue(context);
     }
 
+    public void pingApi() {
+        String url = API_BASE_URL + "/ping";
+        Log.d("GuitarAPI", "pinging api to keep server awake");
+
+        StringRequest request = new StringRequest(Request.Method.GET, url,
+                response -> Log.d("GuitarAPI", "ping ok"),
+                error -> Log.e("GuitarAPI", "ping failed: " + error.toString())
+        );
+        requestQueue.add(request);
+    }
 
     public void fetchChords(String filter) {
         String url = API_BASE_URL + "/chords";

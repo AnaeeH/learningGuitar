@@ -16,10 +16,14 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import com.herbillon.guitar.utils.KeepAliveScheduler;
+
 public class MainActivity extends AppCompatActivity {
     private ProgressBar globalProgressBar;
+    private KeepAliveScheduler keepAliveScheduler;
 
     @Override
+    // Code exécuté lorsque l'appli se lance pour la première fois
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -71,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         GuitarApp app = (GuitarApp) getApplication();
+        keepAliveScheduler = new KeepAliveScheduler(app.guitarAPI);
         showLoading();
         app.guitarAPI.fetchChords("");
         app.guitarAPI.fetchMusics(false, false, null, null);
@@ -84,5 +89,19 @@ public class MainActivity extends AppCompatActivity {
     public void hideLoading() {
         if (globalProgressBar != null)
             globalProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    // Code exécuter lorsque l'appli passe en premier plan
+    protected void onResume() {
+        super.onResume();
+        keepAliveScheduler.start();
+    }
+
+    @Override
+    // Code exécuté lorsque l'appli passe en arrière plan
+    protected void onPause() {
+        super.onPause();
+        keepAliveScheduler.stop();
     }
 }

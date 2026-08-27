@@ -24,6 +24,7 @@ import com.herbillon.guitar.model.Beat;
 import com.herbillon.guitar.network.GuitarAPI;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class TablatureFragment extends AbstractMusicFragment implements Observer {
     private FragmentTablatureBinding binding;
@@ -62,6 +63,14 @@ public class TablatureFragment extends AbstractMusicFragment implements Observer
             isRiff = GuitarAPI.dataTablature.getBoolean("riff");
             time1 = Integer.parseInt(timeSignature.split("/")[0]);
             time2 = Integer.parseInt(timeSignature.split("/")[1]);
+
+            JSONObject video = GuitarAPI.dataTablature.optJSONObject("video");
+            if (video != null){
+                videoId = video.getString("videoId");
+                startMs = video.getInt("startSec");
+            }
+//            videoId = "8Z0vr5nV8Io";
+//            startMs = 14515;
             GuitarAPI.dataTablature = null;
 
             findRepeatBounds();
@@ -98,7 +107,7 @@ public class TablatureFragment extends AbstractMusicFragment implements Observer
         SheetView sheetView = binding.sheetView;
         sheetView.setMusique(measures, measures.size(), time1, time2, 6);
         setupControls();
-        loadYoutube("8Z0vr5nV8Io", 14300);
+        loadYoutube();
     }
 
     @Override
