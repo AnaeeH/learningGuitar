@@ -51,7 +51,7 @@ public class GuitarAPI {
     public void start(Context context) {
         requestQueue = Volley.newRequestQueue(context);
     }
-    
+
     /**
      * Ping Render every 13 minutes to prevent it from going into sleep mode
      */
@@ -281,10 +281,10 @@ public class GuitarAPI {
      * For comment, difficulty and status of the music
      *
      * @param id, id of the music
-     * @param field, field (comment, difficulty or status)
+     * @param field, field (comment, difficulty or progress)
      * @param value, new value
      */
-    public void patchMusic(int id, String field, String value) {
+    public void patchMusic(int id, String field, Object value) {
         String url = API_BASE_URL + "/patch/music/" + id + "/" + field;
 
         JSONObject body = new JSONObject();

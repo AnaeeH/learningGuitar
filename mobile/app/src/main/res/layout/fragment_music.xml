@@ -86,18 +86,36 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="STATUT"
+                android:text="PROGRESSION"
                 android:textColor="@color/dark_textSecondary"
                 android:textSize="12sp"
                 android:textAllCaps="true"
                 android:layout_marginTop="10dp" />
 
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chipGroupStatus"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:singleSelection="true"
-                app:selectionRequired="true"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <SeekBar
+                    android:id="@+id/seekBarProgress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="100" />
+
+                <TextView
+                    android:id="@+id/textProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:minWidth="48dp"
+                    android:gravity="end"
+                    android:textColor="@color/dark_text"
+                    android:textSize="16sp"
+                    android:fontFeatureSettings="tnum" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"

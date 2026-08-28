@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.SeekBar;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -90,10 +91,10 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         return view;
     }
 
-    private void setupChips(ChipGroup chipGroup, String[][] values, String currentValue) {
+    private void setupDifficultyChips(ChipGroup chipGroup, String currentValue) {
 
         Map<Integer, String> mapping = new HashMap<>();
-        for (String[] entry : values) {
+        for (String[] entry : MusicConstants.DIFFICULTY_VALUES) {
             if (!entry[0].isEmpty()){
                 Chip chip = new Chip(requireContext());
                 chip.setText(entry[1]);
@@ -115,11 +116,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
             if (selectedChip == null) return;
 
             String selectedValue = (String) selectedChip.getTag();
-            if (chipGroup == binding.chipGroupStatus) {
-                guitarAPI.patchMusic(musicId, "status", selectedValue);
-            } else {
-                guitarAPI.patchMusic(musicId, "difficulty", selectedValue);
-            }
+            guitarAPI.patchMusic(musicId, "difficulty", selectedValue);
         });
     }
 
@@ -208,6 +205,26 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
             ((TextView) composants.get("textChords")).setVisibility(View.VISIBLE);
             ((TextView) composants.get("textChords")).setText(musicChords);
         }
+
+        binding.seekBarProgress.setProgress(music.getProgress());
+        binding.textProgress.setText(music.getProgress() + "%");
+        binding.seekBarProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                binding.textProgress.setText(progress + "%");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                int newProgress = seekBar.getProgress();
+                if (newProgress != music.getProgress()) {
+                    guitarAPI.patchMusic(musicId, "progress", newProgress);
+                }
+            }
+        });
     }
 
     @Override
@@ -228,12 +245,9 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         processDatas();
         refreshUI();
 
-        binding.chipGroupStatus.setOnCheckedStateChangeListener(null);
         binding.chipGroupDifficulty.setOnCheckedStateChangeListener(null);
-        binding.chipGroupStatus.removeAllViews();
         binding.chipGroupDifficulty.removeAllViews();
-//        setupChips(binding.chipGroupStatus, MusicConstants.STATUS_VALUES, music.getStatus());
-        setupChips(binding.chipGroupDifficulty, MusicConstants.DIFFICULTY_VALUES, music.getDifficulty());
+        setupDifficultyChips(binding.chipGroupDifficulty, music.getDifficulty());
     }
 
     @Override
