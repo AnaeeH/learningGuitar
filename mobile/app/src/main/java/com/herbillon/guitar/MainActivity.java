@@ -12,6 +12,10 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
+import android.os.CountDownTimer;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import java.util.Locale;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -20,6 +24,9 @@ import com.herbillon.guitar.utils.KeepAliveScheduler;
 
 public class MainActivity extends AppCompatActivity {
     private ProgressBar globalProgressBar;
+    private LinearLayout wakeupContainer;
+    private TextView wakeupCountdownText;
+    private CountDownTimer wakeupTimer;
     private KeepAliveScheduler keepAliveScheduler;
 
     @Override
@@ -29,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         globalProgressBar = findViewById(R.id.globalProgressBar);
+        wakeupContainer = findViewById(R.id.wakeupContainer);
+        wakeupCountdownText = findViewById(R.id.wakeupCountdownText);
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
@@ -76,9 +85,33 @@ public class MainActivity extends AppCompatActivity {
 
         GuitarApp app = (GuitarApp) getApplication();
         keepAliveScheduler = new KeepAliveScheduler(app.guitarAPI);
+        startWakeupCountdown(app);
+    }
+
+    private void startWakeupCountdown(GuitarApp app) {
+        final long WAKEUP_DURATION_MS = 80 * 1000L;
+        app.guitarAPI.pingApi();
         showLoading();
-        app.guitarAPI.fetchChords("");
-        app.guitarAPI.fetchMusics(false, false, null, null);
+        wakeupContainer.setVisibility(View.VISIBLE);
+
+        wakeupTimer = new CountDownTimer(WAKEUP_DURATION_MS, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                long totalSeconds = (millisUntilFinished + 999) / 1000;
+                long minutes = totalSeconds / 60;
+                long seconds = totalSeconds % 60;
+                wakeupCountdownText.setText(String.format(Locale.US, "%d:%02d", minutes, seconds));
+            }
+
+            @Override
+            public void onFinish() {
+                hideLoading();
+                wakeupContainer.setVisibility(View.GONE);
+                app.guitarAPI.fetchChords("");
+                app.guitarAPI.fetchMusics(false, false, null, null);
+            }
+        };
+        wakeupTimer.start();
     }
 
     public void showLoading() {
@@ -89,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
     public void hideLoading() {
         if (globalProgressBar != null)
             globalProgressBar.setVisibility(View.GONE);
+        wakeupContainer.setVisibility(View.GONE);
     }
 
     @Override
@@ -103,5 +137,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         keepAliveScheduler.stop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (wakeupTimer != null) {
+            wakeupTimer.cancel();
+        }
     }
 }
