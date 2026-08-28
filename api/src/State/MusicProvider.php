@@ -24,6 +24,13 @@ class MusicProvider implements ProviderInterface
                 $context['filters']['difficulty'] ?? null,
                 $status
             ),
+            'get_artist'       => $this->musicRepository->findAllOrdered(
+                'artist',
+                $context['filters']['favorite'] ?? null,
+                $context['filters']['riff'] ?? null,
+                $context['filters']['difficulty'] ?? null,
+                $status
+            ),
             'get_recent'      => $this->musicRepository->findAllOrdered(
                 'recent',
                 $context['filters']['favorite'] ?? null,

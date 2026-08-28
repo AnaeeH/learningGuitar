@@ -24,21 +24,26 @@ class MusicRepository extends ServiceEntityRepository
         ?string $difficulty = null,
         ?string $status = null
     ): array {
-        $field = $orderBy === 'recent' ? 'm.last_played_at' : 'm.title';
-
+        [$field, $direction] = match ($orderBy) {
+            'title'  => ['m.title', 'ASC'],
+            'artist' => ['m.artist', 'ASC'],
+            default  => ['m.last_played_at', 'DESC'], // 'recent'
+        };
         $queryBuilder = $this->createQueryBuilder('m')
-            ->orderBy($field, 'DESC');
+            ->orderBy($field, $direction);
+
+        if ($orderBy === 'artist') {
+            $queryBuilder->addOrderBy('m.title', 'ASC');
+        }
 
         if ($favorite !== null) {
             $queryBuilder->andWhere('m.favorite = :favorite')
                 ->setParameter('favorite', $favorite);
         }
-
         if ($riff !== null) {
             $queryBuilder->andWhere('m.riff = :riff')
                 ->setParameter('riff', $riff);
         }
-
         if ($difficulty !== null) {
             $queryBuilder->andWhere('m.difficulty = :difficulty')
                 ->setParameter('difficulty', $difficulty);

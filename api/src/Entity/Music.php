@@ -48,6 +48,15 @@ use Symfony\Component\Validator\Constraints\Date;
                 'status' => new QueryParameter(),
             ]
         ),
+         new GetCollection(
+            uriTemplate: '/get/musics/artist',
+            name: 'get_artist',
+            provider: MusicProvider::class,
+            normalizationContext: ['groups' => ['music:read']],
+            parameters: [
+                'status' => new QueryParameter(),
+            ]
+        ),
         new GetCollection(
             uriTemplate: '/get/musics/recent',
             name: 'get_recent',
@@ -109,7 +118,7 @@ use Symfony\Component\Validator\Constraints\Date;
             normalizationContext: ['groups' => ['music:read']]
         ),
         new Patch(
-            uriTemplate: '/patch/music/{id}/last-played',
+            uriTemplate: '/patch/music/{id}/last_played_at',
             denormalizationContext: ['groups' => ['music:last_played_at']],
             normalizationContext: ['groups' => ['music:read']]
         ),

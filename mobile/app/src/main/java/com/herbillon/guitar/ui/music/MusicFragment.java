@@ -39,7 +39,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MusicFragment extends Fragment implements Observer, Refreshable {
 
@@ -78,6 +80,8 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         GuitarAPI.dataSong = null;
         guitarAPI.fetchMusic(musicId);
         guitarAPI.fetchMusicChords(musicId);
+        String now = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US).format(new Date());
+        guitarAPI.patchMusic(musicId, "last_played_at", now);
 
         binding.btnTablature.setOnClickListener(v -> {
             if (music == null) return;
