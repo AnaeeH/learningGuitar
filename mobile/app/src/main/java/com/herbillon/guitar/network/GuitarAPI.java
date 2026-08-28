@@ -51,7 +51,10 @@ public class GuitarAPI {
     public void start(Context context) {
         requestQueue = Volley.newRequestQueue(context);
     }
-
+    
+    /**
+     * Ping Render every 13 minutes to prevent it from going into sleep mode
+     */
     public void pingApi() {
         String url = API_BASE_URL + "/ping";
         Log.d("GuitarAPI", "pinging api to keep server awake");
@@ -63,6 +66,11 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
+    /**
+     * Fetches all chords that match the selected filter
+     *
+     * @param filter, filter of chords
+     */
     public void fetchChords(String filter) {
         String url = API_BASE_URL + "/chords";
 
@@ -93,6 +101,14 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
+    /**
+     * Fetches all music that match the selected filter
+     *
+     * @param favorite, boolean favorite or not
+     * @param riff, boolean riff or not
+     * @param status, to learn, learnt, learned
+     * @param difficulty, easy, medium, hard
+     */
     public void fetchMusics(boolean favorite, boolean riff, String status, String difficulty) {
         String url = API_BASE_URL + "/get/musics/recent";
 
@@ -134,6 +150,11 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
+    /**
+     * Fetches the data for the selected music
+     *
+     * @param id, id of the music
+     */
     public void fetchMusic(int id){
         String url = API_BASE_URL + "/get/music/" + id;
         Log.d("GuitarAPI", "fetching music");
@@ -156,6 +177,11 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
+    /**
+     * Fetches the chords data for the selected music
+     *
+     * @param id, id of the music
+     */
     public void fetchMusicChords(int id){
         String url = API_BASE_URL + "/get/music/" + id + "/chords";
         Log.d("GuitarAPI", "fetching music");
@@ -178,6 +204,11 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
+    /**
+     * Fetches the tablature data for the selected music
+     *
+     * @param id, id of the music
+     */
     public void fetchTablature(int id){
         String url = API_BASE_URL + "/get/music/" + id + "/tablature";
         Log.d("GuitarAPI", "fetching tablature");
@@ -200,6 +231,14 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
+    /**
+     * Function to add a music to these favorites
+     *
+     * @param id, id of the music
+     * @param favorite, a boolean true or false
+     * @param inFavorite, a boolean value of its previous value
+     * @param inRiff,  boolean value for the riff
+     */
     public void patchMusicFavorite(int id, boolean favorite, boolean inFavorite, boolean inRiff) {
         String url = API_BASE_URL + "/patch/music/" + id + "/favorite";
 
@@ -237,6 +276,14 @@ public class GuitarAPI {
         requestQueue.add(request);
     }
 
+    /**
+     * Function to patch the music
+     * For comment, difficulty and status of the music
+     *
+     * @param id, id of the music
+     * @param field, field (comment, difficulty or status)
+     * @param value, new value
+     */
     public void patchMusic(int id, String field, String value) {
         String url = API_BASE_URL + "/patch/music/" + id + "/" + field;
 
