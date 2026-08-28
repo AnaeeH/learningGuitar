@@ -105,6 +105,12 @@ public abstract class AbstractMusicFragment extends Fragment {
                 stopScroll();
                 ((Button) getBtnPlay()).setText("▶");
             } else {
+                // Restart from the beginning
+                if (!isRiff && scrollPosition >= getTotalScrollable()) {
+                    scrollPosition = 0f;
+                    getScrollView().scrollTo(0, 0);
+                    updateProgress(0f);
+                }
                 startScroll();
                 ((Button) getBtnPlay()).setText("⏸");
             }
