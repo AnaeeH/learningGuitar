@@ -1,8 +1,6 @@
 package com.herbillon.guitar.network;
 
 import android.content.Context;
-import android.os.Handler;
-import android.util.Base64;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -16,16 +14,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
-import androidx.appcompat.app.AlertDialog;
 
 public class GuitarAPI {
     public static final String API_BASE_URL = "https://guitarapi-yl09.onrender.com/api";
@@ -104,13 +99,13 @@ public class GuitarAPI {
     /**
      * Fetches all music that match the selected filter
      *
-     * @param favorite, boolean favorite or not
-     * @param riff, boolean riff or not
-     * @param status, to learn, learnt, learned
+     * @param favorite,   boolean favorite or not
+     * @param riff,       boolean riff or not
+     * @param status,     to learn, learnt, learned
      * @param difficulty, easy, medium, hard
      */
-    public void fetchMusics(boolean favorite, boolean riff, String status, String difficulty) {
-        String url = API_BASE_URL + "/get/musics/recent";
+    public void fetchMusics(String sort, boolean favorite, boolean riff, String status, String difficulty) {
+        String url = API_BASE_URL + "/get/musics/" + sort;
 
         List<String> params = new ArrayList<>();
 
@@ -155,7 +150,7 @@ public class GuitarAPI {
      *
      * @param id, id of the music
      */
-    public void fetchMusic(int id){
+    public void fetchMusic(int id) {
         String url = API_BASE_URL + "/get/music/" + id;
         Log.d("GuitarAPI", "fetching music");
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
@@ -182,7 +177,7 @@ public class GuitarAPI {
      *
      * @param id, id of the music
      */
-    public void fetchMusicChords(int id){
+    public void fetchMusicChords(int id) {
         String url = API_BASE_URL + "/get/music/" + id + "/chords";
         Log.d("GuitarAPI", "fetching music");
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,
@@ -209,7 +204,7 @@ public class GuitarAPI {
      *
      * @param id, id of the music
      */
-    public void fetchTablature(int id){
+    public void fetchTablature(int id) {
         String url = API_BASE_URL + "/get/music/" + id + "/tablature";
         Log.d("GuitarAPI", "fetching tablature");
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
@@ -234,12 +229,13 @@ public class GuitarAPI {
     /**
      * Function to add a music to these favorites
      *
-     * @param id, id of the music
-     * @param favorite, a boolean true or false
+     * @param sort,       the sort
+     * @param id,         id of the music
+     * @param favorite,   a boolean true or false
      * @param inFavorite, a boolean value of its previous value
-     * @param inRiff,  boolean value for the riff
+     * @param inRiff,     boolean value for the riff
      */
-    public void patchMusicFavorite(int id, boolean favorite, boolean inFavorite, boolean inRiff) {
+    public void patchMusicFavorite(String sort, int id, boolean favorite, boolean inFavorite, boolean inRiff) {
         String url = API_BASE_URL + "/patch/music/" + id + "/favorite";
 
         JSONObject body = new JSONObject();
@@ -254,7 +250,7 @@ public class GuitarAPI {
                 url, body,
                 response -> {
                     Log.d("GuitarAPI", "datas received : " + response);
-                    fetchMusics(inFavorite, inRiff,null, null);
+                    fetchMusics(sort, inFavorite, inRiff, null, null);
                     liveData.setValue(this);
                 }, error -> {
             if (error.networkResponse != null) {
@@ -264,15 +260,15 @@ public class GuitarAPI {
                 Log.e("GuitarAPI", error.toString());
             }
         }
-        ){
+        ) {
             @Override
-            public Map<String, String> getHeaders () {
+            public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<>();
                 headers.put("Content-Type", "application/merge-patch+json");
                 headers.put("Accept", "application/json");
                 return headers;
             }
-        } ;
+        };
         requestQueue.add(request);
     }
 
@@ -280,7 +276,7 @@ public class GuitarAPI {
      * Function to patch the music
      * For comment, difficulty and status of the music
      *
-     * @param id, id of the music
+     * @param id,    id of the music
      * @param field, field (comment, difficulty or progress)
      * @param value, new value
      */

@@ -1,20 +1,18 @@
 package com.herbillon.guitar;
 
-import android.graphics.Insets;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.ProgressBar;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
-import android.os.CountDownTimer;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+
 import java.util.Locale;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -108,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                 hideLoading();
                 wakeupContainer.setVisibility(View.GONE);
                 app.guitarAPI.fetchChords("");
-                app.guitarAPI.fetchMusics(false, false, null, null);
+                app.guitarAPI.fetchMusics("recent", false, false, null, null);
             }
         };
         wakeupTimer.start();

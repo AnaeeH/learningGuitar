@@ -10,18 +10,19 @@ public class Music {
     private String comment;
     private String difficulty;
     private int progress;
+    private boolean riff;
 
     private int tempo;
     private String timeSignature;
-    private boolean riff;
 
-    public Music(int id, String n, String a, boolean f, String d, int p){
+    public Music(int id, String n, String a, boolean f, String d, int p, boolean r){
         this.id = id;
         this.title = n;
         this.favorite = f;
         this.artist = a;
         this.difficulty = d;
         this.progress = p;
+        this.riff = r;
     }
 
     public Music(int id, String n, String a, boolean f, String d, int p, int t, String timeSig, String c, boolean r){
@@ -31,11 +32,11 @@ public class Music {
         this.artist = a;
         this.difficulty = d;
         this.progress = p;
+        this.riff = r;
 
         this.tempo = t;
         this.timeSignature = timeSig;
         this.comment = c;
-        this.riff = r;
     }
 
     public int getId() {

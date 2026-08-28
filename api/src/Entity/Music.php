@@ -48,7 +48,7 @@ use Symfony\Component\Validator\Constraints\Date;
                 'status' => new QueryParameter(),
             ]
         ),
-         new GetCollection(
+        new GetCollection(
             uriTemplate: '/get/musics/artist',
             name: 'get_artist',
             provider: MusicProvider::class,

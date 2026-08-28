@@ -3,36 +3,54 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
+    android:gravity="top"
     android:orientation="vertical"
-    android:gravity="top">
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
 
-    <EditText
-        android:id="@+id/searchInput"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:padding="12dp"
-        android:hint="Rechercher une musique..."
-        android:textColor="@color/dark_text"
-        android:textColorHint="@color/dark_textSecondary"
-        android:inputType="text"
-        android:drawableTint="@color/dark_textSecondary"
-        android:drawablePadding="8dp" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/searchInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/dark_textSecondary"
+            android:hint="Rechercher une musique..."
+            android:inputType="text"
+            android:padding="12dp"
+            android:textColor="@color/dark_text"
+            android:textColorHint="@color/dark_textSecondary" />
+
+        <ImageButton
+            android:id="@+id/btnSort"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Trier"
+            android:src="@drawable/ic_sort"
+            app:tint="@color/dark_text" />
+    </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/dark_line"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"/>
+        android:layout_marginBottom="5dp"
+        android:background="@color/dark_line" />
 
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="none"
-        android:overScrollMode="never">
+        android:overScrollMode="never"
+        android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -43,15 +61,15 @@
                 android:id="@+id/chipGroupFavorite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:singleSelection="true"
-                app:selectionRequired="false">
+                app:selectionRequired="false"
+                app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipFavorite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Favoris"
-                    android:checkable="true"/>
+                    android:checkable="true"
+                    android:text="Favoris" />
 
             </com.google.android.material.chip.ChipGroup>
 
@@ -60,15 +78,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                app:singleSelection="true"
-                app:selectionRequired="false">
+                app:selectionRequired="false"
+                app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipRiff"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Riff"
-                    android:checkable="true"/>
+                    android:checkable="true"
+                    android:text="Riff" />
 
             </com.google.android.material.chip.ChipGroup>
 
@@ -80,7 +98,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="7dp"
                 android:layout_marginBottom="7dp"
-                android:background="@drawable/spinner_chip_background"/>
+                android:background="@drawable/spinner_chip_background" />
 
             <Spinner
                 android:id="@+id/spinnerDifficulty"
@@ -89,7 +107,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="7dp"
                 android:layout_marginBottom="7dp"
-                android:background="@drawable/spinner_chip_background"/>
+                android:background="@drawable/spinner_chip_background" />
 
         </LinearLayout>
 
@@ -98,16 +116,16 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/dark_line"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"/>
+        android:layout_marginBottom="5dp"
+        android:background="@color/dark_line" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        >
+        android:layout_marginRight="8dp">
+
     </androidx.recyclerview.widget.RecyclerView>
 </LinearLayout>

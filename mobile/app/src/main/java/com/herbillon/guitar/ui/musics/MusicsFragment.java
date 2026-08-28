@@ -8,28 +8,26 @@ import androidx.lifecycle.Observer;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 
-import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.herbillon.guitar.GuitarApp;
 import com.herbillon.guitar.MainActivity;
 import com.herbillon.guitar.R;
 import com.herbillon.guitar.Refreshable;
 import com.herbillon.guitar.databinding.FragmentMusicsBinding;
-import com.herbillon.guitar.model.Chord;
 import com.herbillon.guitar.model.Music;
 import com.herbillon.guitar.network.GuitarAPI;
-import com.herbillon.guitar.ui.chords.ChordAdapter;
 import com.herbillon.guitar.utils.MusicConstants;
 
 import org.json.JSONArray;
@@ -37,13 +35,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MusicsFragment extends Fragment implements Observer, Refreshable {
     private FragmentMusicsBinding binding;
     private GuitarAPI guitarAPI;
+    private String currentSort = "recent";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -60,6 +57,7 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
 
         setupSpinner(binding.spinnerStatus, MusicConstants.STATUS_VALUES);
         setupSpinner(binding.spinnerDifficulty, MusicConstants.DIFFICULTY_VALUES);
+        setupSortButton();
 
         ChipGroup.OnCheckedStateChangeListener listener = (group, checkedIds) -> onRefresh();
         binding.chipGroupFavorite.setOnCheckedStateChangeListener(listener);
@@ -67,7 +65,8 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
 
         binding.searchInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -75,7 +74,8 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         return view;
@@ -93,14 +93,42 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
         adapter.setDropDownViewResource(R.layout.spinner_chip_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> p, View v, int pos, long id) { onRefresh(); }
-            public void onNothingSelected(AdapterView<?> p) {}
+            public void onItemSelected(AdapterView<?> p, View v, int pos, long id) {
+                onRefresh();
+            }
+
+            public void onNothingSelected(AdapterView<?> p) {
+            }
         });
     }
 
     private String getSpinnerValue(Spinner spinner, String[][] values) {
         int pos = spinner.getSelectedItemPosition();
         return pos == 0 ? null : values[pos][0];
+    }
+
+    private void setupSortButton() {
+        binding.btnSort.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(requireContext(), v);
+            Menu menu = popup.getMenu();
+
+            for (int i = 0; i < MusicConstants.SORT_VALUES.length; i++) {
+                MenuItem item = menu.add(0, i, i, MusicConstants.SORT_VALUES[i][1]);
+                item.setCheckable(true);
+                if (MusicConstants.SORT_VALUES[i][0].equals(currentSort)) {
+                    item.setChecked(true);
+                }
+            }
+            menu.setGroupCheckable(0, true, true);
+
+            popup.setOnMenuItemClickListener(item -> {
+                currentSort = MusicConstants.SORT_VALUES[item.getItemId()][0];
+                onRefresh();
+                return true;
+            });
+
+            popup.show();
+        });
     }
 
     private void filterMusics(String query) {
@@ -122,7 +150,7 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
 
     private List<Music> processDatas() {
         JSONArray datas = GuitarAPI.dataSongs;
-        if (datas == null){
+        if (datas == null) {
             return null;
         }
         List<Music> musics = new ArrayList<>();
@@ -135,7 +163,8 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
                         music.getString("artist"),
                         music.getBoolean("favorite"),
                         music.getString("difficulty"),
-                        music.getInt("progress")
+                        music.getInt("progress"),
+                        music.getBoolean("riff")
                 ));
             }
         } catch (JSONException e) {
@@ -145,7 +174,9 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
     }
 
     private void refreshUI(List<Music> musics) {
-        if (musics == null){ return; }
+        if (musics == null) {
+            return;
+        }
         ((MainActivity) requireActivity()).hideLoading();
         binding.recyclerView.setVisibility(View.VISIBLE);
 
@@ -153,16 +184,17 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
         int selectedIdRiff = binding.chipGroupRiff.getCheckedChipId();
         boolean inFavorite = selectedIdFavorite == binding.chipFavorite.getId();
         boolean inRiff = selectedIdRiff == binding.chipRiff.getId();
+
         MusicAdapter adapter = new MusicAdapter(
                 musics,
-                (music) -> guitarAPI.patchMusicFavorite(music.getId(), music.getFavorite(), inFavorite, inRiff),
-                (music)  -> {
+                (music) -> guitarAPI.patchMusicFavorite(currentSort, music.getId(), music.getFavorite(), inFavorite, inRiff),
+                (music) -> {
                     Bundle bundle = new Bundle();
                     bundle.putInt("musicId", music.getId());
                     bundle.putString("musicTitle", music.getTitle());
                     bundle.putString("musicArtist", music.getArtist());
                     NavHostFragment.findNavController(this).navigate(com.herbillon.guitar.R.id.actionMusicsFragToMusicFrag, bundle);
-                } );
+                });
 
         binding.recyclerView.setAdapter(adapter);
     }
@@ -187,6 +219,7 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
     public void onRefresh() {
         binding.recyclerView.setVisibility(View.GONE);
         ((MainActivity) requireActivity()).showLoading();
+
         int selectedIdFavorite = binding.chipGroupFavorite.getCheckedChipId();
         int selectedIdRiff = binding.chipGroupRiff.getCheckedChipId();
         boolean favorite = selectedIdFavorite == binding.chipFavorite.getId();
@@ -194,6 +227,6 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
         String status = getSpinnerValue(binding.spinnerStatus, MusicConstants.STATUS_VALUES);
         String difficulty = getSpinnerValue(binding.spinnerDifficulty, MusicConstants.DIFFICULTY_VALUES);
 
-        guitarAPI.fetchMusics(favorite, riff, status, difficulty);
+        guitarAPI.fetchMusics(currentSort, favorite, riff, status, difficulty);
     }
 }

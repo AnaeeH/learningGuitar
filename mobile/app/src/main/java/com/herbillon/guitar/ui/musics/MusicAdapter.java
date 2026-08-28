@@ -31,6 +31,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         TextView title;
         TextView artist;
         ImageView favorite;
+        ImageView riff;
         ImageView difficulty;
 
         public MusicViewHolder(@NonNull View itemView) {
@@ -38,6 +39,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             title = itemView.findViewById(R.id.musicTitle);
             artist = itemView.findViewById(R.id.musicArtist);
             favorite = itemView.findViewById(R.id.musicFavorite);
+            riff = itemView.findViewById(R.id.musicRiff);
             difficulty = itemView.findViewById(R.id.musicDifficulty);
         }
     }
@@ -68,11 +70,18 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                 break;
         }
 
-        if (music.getFavorite()){
+        if (music.getFavorite()) {
             holder.favorite.setImageResource(R.drawable.ic_star_filled);
         } else {
             holder.favorite.setImageResource(R.drawable.ic_star_outline);
         }
+
+        if (music.getRiff()) {
+            holder.riff.setVisibility(View.VISIBLE);
+        } else {
+            holder.riff.setVisibility(View.INVISIBLE);
+        }
+
         holder.favorite.setOnClickListener(
                 v -> onFavoriteClick.accept(music)
         );
