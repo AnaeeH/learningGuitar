@@ -164,7 +164,7 @@ class Music
     private bool $favorite = false;
 
     #[ORM\Column(name: 'mus_riff')]
-    #[Groups(['music:write', 'music:detail'])]
+    #[Groups(['music:read', 'music:write', 'music:detail'])]
     private bool $riff = false;
 
     #[ORM\Column(length: 255, nullable: true, name: 'mus_comment')]
