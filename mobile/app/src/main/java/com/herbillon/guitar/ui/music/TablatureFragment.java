@@ -26,6 +26,10 @@ import com.herbillon.guitar.network.GuitarAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class TablatureFragment extends AbstractMusicFragment implements Observer {
     private FragmentTablatureBinding binding;
     private GuitarAPI guitarAPI;
@@ -52,6 +56,8 @@ public class TablatureFragment extends AbstractMusicFragment implements Observer
 
         guitarAPI.addObserver(this);
         guitarAPI.fetchTablature(musicId);
+        String now = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US).format(new Date());
+        guitarAPI.patchMusic(musicId, "last_played_at", now);
         return view;
     }
 

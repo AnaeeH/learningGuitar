@@ -29,6 +29,7 @@ public class GuitarAPI {
     public static JSONArray dataChords = null;
     public static JSONArray dataSongs = null;
     public static JSONObject dataSong = null;
+    public static JSONObject dataSongLastPlayed = null;
     public static JSONArray dataSongChords = null;
     public static JSONObject dataTablature = null;
 
@@ -99,6 +100,7 @@ public class GuitarAPI {
     /**
      * Fetches all music that match the selected filter
      *
+     * @param sort,       sort of the musics
      * @param favorite,   boolean favorite or not
      * @param riff,       boolean riff or not
      * @param status,     to learn, learnt, learned
@@ -131,6 +133,31 @@ public class GuitarAPI {
                 response -> {
                     Log.d("GuitarAPI", "datas received : " + response);
                     dataSongs = response;
+                    liveData.setValue(this);
+                }, error -> Log.e("GuitarAPI", error.toString())
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+                return headers;
+            }
+        };
+        requestQueue.add(request);
+    }
+
+    /**
+     * Fetches the data for last music played
+     */
+    public void fetchMusicLastPlayed() {
+        String url = API_BASE_URL + "/get/music/last-played";
+        Log.d("GuitarAPI", "fetching music");
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                url, null,
+                response -> {
+                    Log.d("GuitarAPI", "datas music : " + response);
+                    dataSongLastPlayed = response;
                     liveData.setValue(this);
                 }, error -> Log.e("GuitarAPI", error.toString())
         ) {

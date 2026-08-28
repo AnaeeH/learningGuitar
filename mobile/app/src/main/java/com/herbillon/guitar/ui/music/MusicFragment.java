@@ -6,42 +6,32 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.SeekBar;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+
 import com.herbillon.guitar.GuitarApp;
 import com.herbillon.guitar.MainActivity;
-import com.herbillon.guitar.R;
 import com.herbillon.guitar.Refreshable;
 import com.herbillon.guitar.databinding.FragmentMusicBinding;
 import com.herbillon.guitar.model.Music;
 import com.herbillon.guitar.network.GuitarAPI;
-import com.herbillon.guitar.ui.musics.MusicAdapter;
 import com.herbillon.guitar.utils.MusicConstants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 public class MusicFragment extends Fragment implements Observer, Refreshable {
 
@@ -80,8 +70,6 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         GuitarAPI.dataSong = null;
         guitarAPI.fetchMusic(musicId);
         guitarAPI.fetchMusicChords(musicId);
-        String now = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US).format(new Date());
-        guitarAPI.patchMusic(musicId, "last_played_at", now);
 
         binding.btnTablature.setOnClickListener(v -> {
             if (music == null) return;

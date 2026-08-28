@@ -19,6 +19,9 @@
         <action
             android:id="@+id/actionMusicsFragToMusicFrag"
             app:destination="@id/nav_music" />
+        <action
+            android:id="@+id/actionMusicsFragToTablatureFrag"
+            app:destination="@id/nav_tablature" />
     </fragment>
 
     <fragment

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -54,6 +55,7 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
         guitarAPI = app.guitarAPI;
         guitarAPI.addObserver(this);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        updateLastPlayedHero();
 
         setupSpinner(binding.spinnerStatus, MusicConstants.STATUS_VALUES);
         setupSpinner(binding.spinnerDifficulty, MusicConstants.DIFFICULTY_VALUES);
@@ -173,6 +175,39 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
         return musics;
     }
 
+    private void updateLastPlayedHero() {
+        JSONObject data = GuitarAPI.dataSongLastPlayed;
+        if (data == null) {
+            binding.lastPlayed.lastPlayedContainer.setVisibility(View.GONE);
+            return;
+        }
+
+        try {
+            int id = data.getInt("id");
+            String title = data.getString("title");
+            String artist = data.getString("artist");
+            int progress = data.getInt("progress");
+
+            binding.lastPlayed.lastPlayedTitle.setText(title);
+            binding.lastPlayed.lastPlayedArtist.setText(artist);
+            binding.lastPlayed.lastPlayedProgressBar.setProgress(progress);
+            binding.lastPlayed.lastPlayedProgressText.setText(progress + "% complété");
+            binding.lastPlayed.lastPlayedContainer.setVisibility(View.VISIBLE);
+
+            binding.lastPlayed.lastPlayedContainer.setOnClickListener(v -> {
+                Bundle bundle = new Bundle();
+                bundle.putInt("musicId", id);
+                bundle.putString("musicTitle", title);
+                bundle.putString("musicArtist", artist);
+                Navigation.findNavController(v)
+                        .navigate(R.id.actionMusicsFragToTablatureFrag, bundle);
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+            binding.lastPlayed.lastPlayedContainer.setVisibility(View.GONE);
+        }
+    }
+
     private void refreshUI(List<Music> musics) {
         if (musics == null) {
             return;
@@ -208,6 +243,7 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
 
     @Override
     public void onChanged(Object o) {
+        updateLastPlayedHero();
         binding.recyclerView.setVisibility(View.GONE);
         ((MainActivity) requireActivity()).showLoading();
 
@@ -228,5 +264,11 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
         String difficulty = getSpinnerValue(binding.spinnerDifficulty, MusicConstants.DIFFICULTY_VALUES);
 
         guitarAPI.fetchMusics(currentSort, favorite, riff, status, difficulty);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        guitarAPI.fetchMusicLastPlayed();
     }
 }

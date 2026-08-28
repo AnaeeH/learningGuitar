@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout wakeupContainer;
     private TextView wakeupCountdownText;
     private CountDownTimer wakeupTimer;
+    private static boolean wakeupDone = false;
     private KeepAliveScheduler keepAliveScheduler;
 
     @Override
@@ -83,7 +84,15 @@ public class MainActivity extends AppCompatActivity {
 
         GuitarApp app = (GuitarApp) getApplication();
         keepAliveScheduler = new KeepAliveScheduler(app.guitarAPI);
-        startWakeupCountdown(app);
+        if (!wakeupDone) {
+            wakeupDone = true;
+            startWakeupCountdown(app);
+        } else {
+            // wakeup already played this session, fetch immediately
+            app.guitarAPI.fetchChords("");
+            app.guitarAPI.fetchMusics("recent", false, false, null, null);
+            app.guitarAPI.fetchMusicLastPlayed();
+        }
     }
 
     private void startWakeupCountdown(GuitarApp app) {
@@ -107,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 wakeupContainer.setVisibility(View.GONE);
                 app.guitarAPI.fetchChords("");
                 app.guitarAPI.fetchMusics("recent", false, false, null, null);
+                app.guitarAPI.fetchMusicLastPlayed();
             }
         };
         wakeupTimer.start();
@@ -120,7 +130,8 @@ public class MainActivity extends AppCompatActivity {
     public void hideLoading() {
         if (globalProgressBar != null)
             globalProgressBar.setVisibility(View.GONE);
-        wakeupContainer.setVisibility(View.GONE);
+        if (wakeupContainer != null)
+            wakeupContainer.setVisibility(View.GONE);
     }
 
     @Override

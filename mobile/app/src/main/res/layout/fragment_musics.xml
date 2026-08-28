@@ -39,6 +39,10 @@
             app:tint="@color/dark_text" />
     </LinearLayout>
 
+    <include
+        android:id="@+id/lastPlayed"
+        layout="@layout/include_last_played" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
