@@ -14,4 +14,16 @@
     <color name="dark_textSecondary">#AFA9EC</color>
     <color name="dark_tabBackground">#0F6E56</color>
     <color name="dark_tabText">#9FE1CB</color>
+
+
+
+
+    <color name="app_background">#0F0F1A</color>          <!-- Fond principal, presque noir -->
+    <color name="app_surface">#1C1C2A</color>            <!-- Cards, inputs, éléments élevés -->
+    <color name="app_surface_variant">#252535</color>    <!-- Chips inactifs, boutons secondaires -->
+    <color name="app_accent">#8B5CF6</color>             <!-- Violet vif (l'accent star) -->
+    <color name="app_accent_soft">#A78BFA</color>        <!-- Violet clair (hover, textes accent) -->
+    <color name="app_text_primary">#FFFFFF</color>       <!-- Texte principal -->
+    <color name="app_text_secondary">#9CA3AF</color>     <!-- Texte secondaire, placeholders -->
+    <color name="app_border">#2A2A3A</color>             <!-- Bordures très subtiles -->
 </resources>

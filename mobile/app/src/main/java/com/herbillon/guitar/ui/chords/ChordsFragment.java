@@ -13,9 +13,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.herbillon.guitar.GuitarApp;
 import com.herbillon.guitar.MainActivity;
+import com.herbillon.guitar.R;
 import com.herbillon.guitar.Refreshable;
 import com.herbillon.guitar.databinding.FragmentChordsBinding;
 import com.herbillon.guitar.model.Chord;
@@ -49,7 +51,9 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
             onRefresh();
         });
 
-        binding.searchInput.addTextChangedListener(new TextWatcher() {
+        EditText searchInput = view.findViewById(R.id.searchInput);
+        searchInput.setHint(R.string.search_chord);
+        binding.searchBar.searchInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
@@ -123,7 +127,7 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
         binding.recyclerView.setVisibility(View.GONE);
         ((MainActivity) requireActivity()).showLoading();
 
-        String query = binding.searchInput.getText().toString();
+        String query = binding.searchBar.searchInput.getText().toString();
         filterChords(query);
     }
 

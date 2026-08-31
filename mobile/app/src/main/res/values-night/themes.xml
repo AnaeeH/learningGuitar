@@ -5,7 +5,7 @@
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
 
             <!-- Background -->
-            <item name="android:windowBackground">@color/dark_background</item>
+            <item name="android:windowBackground">@color/app_background</item>
             <item name="colorOnBackground">@color/dark_mainColor</item>
 
             <!-- Line -->

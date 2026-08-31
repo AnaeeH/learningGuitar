@@ -1,8 +1,11 @@
 package com.herbillon.guitar.ui.musics;
 
+import android.content.res.ColorStateList;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
@@ -11,15 +14,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.PopupMenu;
+import android.widget.ImageView;
+import android.widget.ListPopupWindow;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.google.android.material.chip.ChipGroup;
 import com.herbillon.guitar.GuitarApp;
@@ -42,6 +47,8 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
     private FragmentMusicsBinding binding;
     private GuitarAPI guitarAPI;
     private String currentSort = "recent";
+    private ListPopupWindow sortPopup;
+    private boolean sortPopupVisible = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -65,7 +72,9 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
         binding.chipGroupFavorite.setOnCheckedStateChangeListener(listener);
         binding.chipGroupRiff.setOnCheckedStateChangeListener(listener);
 
-        binding.searchInput.addTextChangedListener(new TextWatcher() {
+
+        binding.searchBar.searchInput.setHint(R.string.search_music);
+        binding.searchBar.searchInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -90,12 +99,44 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 requireContext(),
                 R.layout.spinner_chip_selected,
+                R.id.spinnerText,
                 labels
-        );
+        ) {
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                if (view instanceof TextView) {
+                    TextView tv = (TextView) view;
+                    boolean isActive = spinner.getSelectedItemPosition() == position;
+                    styleDropdownItem(tv, isActive);
+                }
+                return view;
+            }
+        };
         adapter.setDropDownViewResource(R.layout.spinner_chip_item);
         spinner.setAdapter(adapter);
+        int offsetPx = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, -16, getResources().getDisplayMetrics()
+        );
+        spinner.setDropDownHorizontalOffset(offsetPx);
+
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> p, View v, int pos, long id) {
+                int colorRes = (pos == 0) ? R.color.app_surface : R.color.app_accent;
+                ColorStateList tint = ColorStateList.valueOf(
+                        ContextCompat.getColor(requireContext(), colorRes)
+                );
+                spinner.setBackgroundTintList(tint);
+
+                if (v != null) {
+                    int textColorRes = (pos == 0) ? R.color.app_text_secondary : R.color.app_text_primary;
+                    int textColor = ContextCompat.getColor(requireContext(), textColorRes);
+                    TextView tv = v.findViewById(R.id.spinnerText);
+                    ImageView arrow = v.findViewById(R.id.spinnerArrow);
+
+                    if (tv != null) tv.setTextColor(textColor);
+                    if (arrow != null) arrow.setImageTintList(ColorStateList.valueOf(textColor));
+                }
                 onRefresh();
             }
 
@@ -111,26 +152,64 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
 
     private void setupSortButton() {
         binding.btnSort.setOnClickListener(v -> {
-            PopupMenu popup = new PopupMenu(requireContext(), v);
-            Menu menu = popup.getMenu();
-
-            for (int i = 0; i < MusicConstants.SORT_VALUES.length; i++) {
-                MenuItem item = menu.add(0, i, i, MusicConstants.SORT_VALUES[i][1]);
-                item.setCheckable(true);
-                if (MusicConstants.SORT_VALUES[i][0].equals(currentSort)) {
-                    item.setChecked(true);
-                }
+            if (sortPopupVisible) {
+                sortPopupVisible = false;
+                sortPopup.dismiss();
+                return;
             }
-            menu.setGroupCheckable(0, true, true);
 
-            popup.setOnMenuItemClickListener(item -> {
-                currentSort = MusicConstants.SORT_VALUES[item.getItemId()][0];
+            sortPopup = new ListPopupWindow(requireContext());
+
+            sortPopup.setAnchorView(v);
+            sortPopup.setBackgroundDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.bg_card)
+            );
+            int verticalOffset = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()
+            );
+            sortPopup.setVerticalOffset(verticalOffset);
+            int contentWidth = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 160, getResources().getDisplayMetrics()
+            );
+            sortPopup.setContentWidth(contentWidth);
+
+            List<String> labels = new ArrayList<>();
+            for (String[] sortValue : MusicConstants.SORT_VALUES) {
+                labels.add(sortValue[1]);
+            }
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                    requireContext(),
+                    R.layout.spinner_chip_item,
+                    R.id.spinnerText,
+                    labels
+            ) {
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    View view = super.getView(position, convertView, parent);
+                    TextView tv = view.findViewById(R.id.spinnerText);
+                    boolean isActive = MusicConstants.SORT_VALUES[position][0].equals(currentSort);
+                    styleDropdownItem(tv, isActive);
+                    return view;
+                }
+            };
+            sortPopup.setAdapter(adapter);
+
+            sortPopup.setOnItemClickListener((parent, view, position, id) -> {
+                currentSort = MusicConstants.SORT_VALUES[position][0];
+                sortPopup.dismiss();
                 onRefresh();
-                return true;
             });
 
-            popup.show();
+            sortPopupVisible = true;
+            sortPopup.show();
         });
+    }
+
+    private void styleDropdownItem(TextView tv, boolean isActive) {
+        int colorRes = isActive ? R.color.app_accent : R.color.app_text_primary;
+        tv.setTextColor(ContextCompat.getColor(requireContext(), colorRes));
+        tv.setTypeface(null, isActive ? Typeface.BOLD : Typeface.NORMAL);
     }
 
     private void filterMusics(String query) {
@@ -247,7 +326,7 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
         binding.recyclerView.setVisibility(View.GONE);
         ((MainActivity) requireActivity()).showLoading();
 
-        String query = binding.searchInput.getText().toString();
+        String query = binding.searchBar.searchInput.getText().toString();
         filterMusics(query);
     }
 

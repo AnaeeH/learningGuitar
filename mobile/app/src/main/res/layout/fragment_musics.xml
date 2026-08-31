@@ -11,32 +11,29 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/searchInput"
-            android:layout_width="0dp"
+        <include
+            android:id="@+id/searchBar"
+            layout="@layout/component_search_bar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawablePadding="8dp"
-            android:drawableTint="@color/dark_textSecondary"
-            android:hint="Rechercher une musique..."
-            android:inputType="text"
-            android:padding="12dp"
-            android:textColor="@color/dark_text"
-            android:textColorHint="@color/dark_textSecondary" />
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="1" />
 
         <ImageButton
             android:id="@+id/btnSort"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/bg_pill"
             android:contentDescription="Trier"
             android:src="@drawable/ic_sort"
-            app:tint="@color/dark_text" />
+            app:tint="@color/app_text_primary" />
     </LinearLayout>
 
     <include
@@ -70,6 +67,7 @@
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipFavorite"
+                    style="@style/AppChip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checkable="true"
@@ -81,12 +79,13 @@
                 android:id="@+id/chipGroupRiff"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="12dp"
                 app:selectionRequired="false"
                 app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipRiff"
+                    style="@style/AppChip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checkable="true"
@@ -94,24 +93,35 @@
 
             </com.google.android.material.chip.ChipGroup>
 
+            <Spinner
+                android:id="@+id/spinnerDifficulty"
+                android:layout_width="match_parent"
+                android:minWidth="105dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="12dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/bg_pill"
+                android:paddingStart="16dp"
+                android:paddingEnd="12dp"
+                android:popupBackground="@drawable/bg_card"
+                android:dropDownVerticalOffset="8dp"
+                android:overlapAnchor="false"
+                android:spinnerMode="dropdown" />
 
             <Spinner
                 android:id="@+id/spinnerStatus"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="7dp"
-                android:layout_marginBottom="7dp"
-                android:background="@drawable/spinner_chip_background" />
+                android:layout_height="40dp"
+                android:layout_marginStart="12dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/bg_pill"
+                android:paddingStart="16dp"
+                android:paddingEnd="12dp"
+                android:popupBackground="@drawable/bg_card"
+                android:dropDownVerticalOffset="8dp"
+                android:overlapAnchor="false"
+                android:spinnerMode="dropdown" />
 
-            <Spinner
-                android:id="@+id/spinnerDifficulty"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="7dp"
-                android:layout_marginBottom="7dp"
-                android:background="@drawable/spinner_chip_background" />
 
         </LinearLayout>
 

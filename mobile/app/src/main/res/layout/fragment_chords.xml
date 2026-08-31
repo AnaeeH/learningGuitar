@@ -8,18 +8,13 @@
     android:orientation="vertical"
     android:gravity="top">
 
-    <EditText
-        android:id="@+id/searchInput"
+    <include
+        android:id="@+id/searchBar"
+        layout="@layout/component_search_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:padding="12dp"
-        android:hint="Rechercher un accord..."
-        android:textColor="@color/dark_text"
-        android:textColorHint="@color/dark_textSecondary"
-        android:inputType="text"
-        android:drawableTint="@color/dark_textSecondary"
-        android:drawablePadding="8dp" />
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
 
     <View
         android:layout_width="match_parent"
@@ -37,6 +32,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipAll"
+            style="@style/AppChip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tous"
@@ -45,6 +41,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipMajor"
+            style="@style/AppChip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Majeur"
@@ -52,6 +49,7 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipMinor"
+            style="@style/AppChip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Mineur"

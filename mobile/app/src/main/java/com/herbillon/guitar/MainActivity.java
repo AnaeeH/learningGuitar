@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
             toolbar.getMenu().clear();
             if (destination.getId() == R.id.nav_tablature) {
                 toolbar.inflateMenu(R.menu.toolbar_tablature);
-                toolbar.setBackgroundColor(getColor(R.color.dark_background2));
+                toolbar.setBackgroundColor(getColor(R.color.dark_background));
             } else {
                 toolbar.inflateMenu(R.menu.toolbar_menu);
                 toolbar.setBackgroundColor(getColor(R.color.dark_mainColor));
