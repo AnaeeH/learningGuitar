@@ -45,7 +45,7 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
         GuitarApp app = (GuitarApp) requireActivity().getApplication();
         guitarAPI = app.guitarAPI;
         guitarAPI.addObserver(this);
-        binding.recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        binding.recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
         binding.chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
             onRefresh();
