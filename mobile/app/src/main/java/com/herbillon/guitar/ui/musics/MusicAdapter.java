@@ -1,5 +1,6 @@
 package com.herbillon.guitar.ui.musics;
 
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.herbillon.guitar.R;
@@ -31,16 +33,16 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         TextView title;
         TextView artist;
         ImageView favorite;
-        ImageView riff;
         ImageView difficulty;
+        View difficultyContainer;
 
         public MusicViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.musicTitle);
             artist = itemView.findViewById(R.id.musicArtist);
             favorite = itemView.findViewById(R.id.musicFavorite);
-            riff = itemView.findViewById(R.id.musicRiff);
             difficulty = itemView.findViewById(R.id.musicDifficulty);
+            difficultyContainer = itemView.findViewById(R.id.musicDifficultyContainer);
         }
     }
 
@@ -70,16 +72,17 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                 break;
         }
 
+        int backgroundColorRes = music.getRiff() ? R.color.app_accent : R.color.app_surface_variant;
+        holder.difficultyContainer.setBackgroundTintList(
+                ColorStateList.valueOf(
+                        ContextCompat.getColor(holder.itemView.getContext(), backgroundColorRes)
+                )
+        );
+
         if (music.getFavorite()) {
             holder.favorite.setImageResource(R.drawable.ic_star_filled);
         } else {
             holder.favorite.setImageResource(R.drawable.ic_star_outline);
-        }
-
-        if (music.getRiff()) {
-            holder.riff.setVisibility(View.VISIBLE);
-        } else {
-            holder.riff.setVisibility(View.INVISIBLE);
         }
 
         holder.favorite.setOnClickListener(

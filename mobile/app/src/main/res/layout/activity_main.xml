@@ -12,10 +12,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/app_background"
+        android:elevation="0dp"
+        app:titleTextAppearance="@style/AppToolbarTitle"
+        app:titleTextColor="@color/app_text_primary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleTextColor="@color/dark_text" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <fragment
         android:id="@+id/nav_host_fragment"
@@ -33,6 +35,12 @@
         android:id="@+id/bottom_nav"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="@color/app_background"
+        app:elevation="0dp"
+        app:itemActiveIndicatorStyle="@style/AppBottomNavIndicator"
+        app:itemIconTint="@color/bottom_nav_item_color"
+        app:itemTextColor="@color/bottom_nav_item_color"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,7 +61,7 @@
         android:id="@+id/wakeupContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="10dp"
         android:elevation="10dp"
         android:gravity="center"
         android:orientation="vertical"
