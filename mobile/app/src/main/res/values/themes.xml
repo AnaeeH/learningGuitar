@@ -18,6 +18,14 @@
         <item name="android:color">@android:color/transparent</item>
     </style>
 
+    <style name="AppSectionLabel">
+        <item name="android:textColor">@color/app_text_secondary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.1</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:layout_marginBottom">10dp</item>
+    </style>
 
     <style name="AppChip.Filter" parent="Widget.Material3.Chip.Filter">
         <item name="chipBackgroundColor">@color/chip_background</item>

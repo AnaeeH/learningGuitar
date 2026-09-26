@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
 
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import android.widget.SeekBar;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
+import com.herbillon.guitar.R;
 import com.herbillon.guitar.GuitarApp;
 import com.herbillon.guitar.MainActivity;
 import com.herbillon.guitar.Refreshable;
@@ -88,7 +90,8 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         Map<Integer, String> mapping = new HashMap<>();
         for (String[] entry : MusicConstants.DIFFICULTY_VALUES) {
             if (!entry[0].isEmpty()){
-                Chip chip = new Chip(requireContext());
+                Chip chip = (Chip) LayoutInflater.from(requireContext())
+                        .inflate(R.layout.item_chip_filter, chipGroup, false);
                 chip.setText(entry[1]);
                 chip.setTag(entry[0]);
                 chip.setCheckable(true);
