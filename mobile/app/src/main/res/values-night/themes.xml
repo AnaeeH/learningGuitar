@@ -1,26 +1,22 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.Guitar" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
 
-            <!-- Background -->
-            <item name="android:windowBackground">@color/app_background</item>
-            <item name="colorOnBackground">@color/dark_mainColor</item>
+        <item name="android:windowBackground">@color/app_background</item>
+        <item name="colorSurface">@color/app_surface</item>
+        <item name="colorOnSurface">@color/app_text_primary</item>
+        <item name="colorSurfaceVariant">@color/app_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/app_text_secondary</item>
 
-            <!-- Line -->
-            <item name="colorOutline">@color/dark_line</item>
+        <item name="colorPrimary">@color/app_accent</item>
+        <item name="colorOnPrimary">@color/app_text_primary</item>
 
-            <!-- Primary -->
-            <item name="colorPrimary">@color/dark_background2</item>
-            <item name="colorOnPrimary">@color/dark_text</item>
+        <item name="colorSecondary">@color/app_accent_tab</item>
+        <item name="colorOnSecondary">@color/app_text_primary</item>
 
-            <!-- Badge Partition -->
-            <item name="colorSecondary">@color/dark_bagde</item>
-            <item name="colorOnSecondary">@color/dark_textSecondary</item>
+        <item name="colorOutline">@color/app_border</item>
 
-            <!-- Badge Tab-->
-            <item name="colorTertiary">@color/dark_tabBackground</item>
-            <item name="colorOnTertiary">@color/dark_tabText</item>
+        <item name="android:statusBarColor">@color/app_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/app_background</item>
     </style>
 </resources>

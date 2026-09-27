@@ -3,21 +3,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!--    Dark theme color -->
-    <color name="dark_background">#1A1A2E</color>
-    <color name="dark_background2">#12122A</color>
-<!--    <color name="dark_backgroundButton">#2A2A4A</color>-->
-    <color name="dark_line">#2E3A5A</color>
-    <color name="dark_mainColor">#534AB7</color>
-    <color name="dark_bagde">#3C3489</color>
-    <color name="dark_text">#EEEDFE</color>
-    <color name="dark_textSecondary">#AFA9EC</color>
-    <color name="dark_tabBackground">#0F6E56</color>
-    <color name="dark_tabText">#9FE1CB</color>
-
-
-
-
     <color name="app_background">#0F0F1A</color>         <!-- Fond principal, presque noir -->
     <color name="app_surface">#1C1C2A</color>            <!-- Cards, inputs, éléments élevés -->
     <color name="app_surface_variant">#252535</color>    <!-- Chips inactifs, boutons secondaires -->
