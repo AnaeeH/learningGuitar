@@ -1,14 +1,15 @@
 package com.herbillon.guitar.ui.music;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
 
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +43,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
     private GuitarAPI guitarAPI;
     private Music music;
     private int musicId;
-    private String musicChords;
+    private String[] musicChords;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -60,7 +61,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
         composants.put("BPM", binding.textBpm);
         composants.put("comment", binding.textComment);
         composants.put("titleChords", binding.titleChords);
-        composants.put("textChords", binding.textChords);
+        composants.put("textChords", binding.chipGroupChords);
 
         GuitarApp app = (GuitarApp) requireActivity().getApplication();
         guitarAPI = app.guitarAPI;
@@ -139,16 +140,18 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
             e.printStackTrace();
         }
 
-        if (datasChords == null) return;
-        try {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < datasChords.length(); i++) {
-                sb.append(datasChords.getString(i) + " ");
+        if (datasChords == null) {
+            musicChords = new String[0];
+        } else {
+            musicChords = new String[datasChords.length()];
+            try {
+                for (int i = 0; i < datasChords.length(); i++) {
+                    musicChords[i] = datasChords.getString(i);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                musicChords = new String[0];
             }
-            musicChords = sb.toString();
-            Log.d("MusicFragment", "fetching " + musicChords);
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
 
         GuitarAPI.dataSong = null;
@@ -192,13 +195,22 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
             ((TextView) composants.get("textRiff")).setVisibility(View.INVISIBLE);
         }
 
-        if (musicChords == null || musicChords.isEmpty()){
+        if (musicChords == null || musicChords.length == 0){
             ((TextView) composants.get("titleChords")).setVisibility(View.GONE);
-            ((TextView) composants.get("textChords")).setVisibility(View.GONE);
+            ((ChipGroup) composants.get("textChords")).setVisibility(View.GONE);
         } else {
             ((TextView) composants.get("titleChords")).setVisibility(View.VISIBLE);
-            ((TextView) composants.get("textChords")).setVisibility(View.VISIBLE);
-            ((TextView) composants.get("textChords")).setText(musicChords);
+            ((ChipGroup) composants.get("textChords")).setVisibility(View.VISIBLE);
+            binding.chipGroupChords.removeAllViews();
+
+            for (String chordName : musicChords) {
+                Chip chip = (Chip) LayoutInflater.from(requireContext())
+                        .inflate(R.layout.item_chip_filter, binding.chipGroupChords, false);
+                chip.setText(chordName);
+                chip.setCheckable(false);
+                chip.setClickable(false);
+                binding.chipGroupChords.addView(chip);
+            }
         }
 
         binding.seekBarProgress.setProgress(music.getProgress());
@@ -233,8 +245,8 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
     public void onChanged(Object o) {
         Log.d("MusicFragment", "onChanged called, dataSong=" + GuitarAPI.dataSong);
         Log.d("MusicFragment", "onChanged called, dataTablature=" + GuitarAPI.dataTablature);
+        if (GuitarAPI.dataSong == null || GuitarAPI.dataSongChords == null) return;
 
-        if (GuitarAPI.dataSong == null) return;
         binding.scrollContent.setVisibility(View.GONE);
         ((MainActivity) requireActivity()).showLoading();
         processDatas();

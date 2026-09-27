@@ -80,8 +80,7 @@
             android:layout_width="80dp"
             android:layout_height="6dp"
             android:max="100"
-            android:progressBackgroundTint="@color/app_surface_variant"
-            android:progressTint="@color/app_accent" />
+            android:progressDrawable="@drawable/seekbar_progress" />
 
         <TextView
             android:id="@+id/lastPlayedProgressText"

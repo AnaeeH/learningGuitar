@@ -100,14 +100,13 @@
                 android:layout_height="wrap_content"
                 android:text="Accords" />
 
-            <TextView
-                android:id="@+id/textChords"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupChords"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:lineSpacingExtra="4dp"
-                android:textColor="@color/app_text_primary"
-                android:textSize="14sp" />
+                app:chipSpacingHorizontal="4dp"
+                app:chipSpacingVertical="4dp" />
 
             <TextView
                 style="@style/AppSectionLabel"
@@ -125,12 +124,14 @@
                 <SeekBar
                     android:id="@+id/seekBarProgress"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="6dp"
                     android:layout_weight="1"
                     android:max="100"
-                    android:progressBackgroundTint="@color/app_surface_variant"
-                    android:progressTint="@color/app_accent"
-                    android:thumbTint="@color/app_accent" />
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
+                    android:progressDrawable="@drawable/seekbar_progress"
+                    android:thumb="@android:color/transparent"
+                    android:splitTrack="false" />
 
                 <TextView
                     android:id="@+id/textProgress"
