@@ -63,24 +63,22 @@ public class SheetView extends View {
     }
 
     private void init(Context context) {
-        int colorLine = ContextCompat.getColor(context, R.color.dark_line);
-        int colorBar  = ContextCompat.getColor(context, R.color.dark_text);
-        int colorBackground = ContextCompat.getColor(context, R.color.dark_background);
-        colorSecondary = ContextCompat.getColor(context, R.color.dark_textSecondary);
-        colorChords = ContextCompat.getColor(context, R.color.dark_mainColor);
+        int colorLine = ContextCompat.getColor(context, R.color.app_border);
+        int colorBar  = ContextCompat.getColor(context, R.color.app_text_secondary);
+
+        colorChords = ContextCompat.getColor(context, R.color.app_accent_tab);
+        colorSecondary = ContextCompat.getColor(context, R.color.app_text_primary);
+        int colorChordName = ContextCompat.getColor(context, R.color.app_text_secondary);
 
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
         measureWidth = dm.widthPixels / 3f;
 
-        rawPaint = buildPaint(colorLine, 5f);
-        barPaint = buildPaint(colorSecondary, 2f);
-        textPaint = buildTextPaint(colorSecondary, 40f);
-        fretPaint = buildTextPaint(colorBar,30f);
+        rawPaint = buildPaint(colorLine, 2f);
+        barPaint = buildPaint(colorBar, 2f);
+        textPaint = buildTextPaint(colorChordName, 40f);
+        fretPaint = buildTextPaint(colorSecondary,30f);
 
-        bgPaint = buildPaint(colorBackground, 0f);
-        bgPaint.setStyle(Paint.Style.FILL);
-
-        chordNamePaint = buildTextPaint(colorSecondary, 30f);
+        chordNamePaint = buildTextPaint(colorChordName, 30f);
         chordNamePaint.setTypeface(Typeface.DEFAULT_BOLD);
     }
 
@@ -252,7 +250,7 @@ public class SheetView extends View {
         float padding = lineSpacing * 0.4f;
 
         // Vertical bar
-        barPaint.setStrokeWidth(25f);
+        barPaint.setStrokeWidth(35f);
         barPaint.setColor(colorChords);
         barPaint.setStrokeCap(Paint.Cap.ROUND);
         canvas.drawLine(x, yTop + padding, x, yBottom - padding, barPaint);
@@ -268,7 +266,7 @@ public class SheetView extends View {
         // Strum direction
         if (strumDirection != null) {
             String symbol = "down".equals(strumDirection) ? "↓" : "↑";
-            canvas.drawText(symbol, x, yBottom + lineSpacing * 1.4f, chordNamePaint);
+            canvas.drawText(symbol, x, yBottom + lineSpacing * 1.2f, chordNamePaint);
         }
     }
 

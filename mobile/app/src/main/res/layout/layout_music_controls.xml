@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="12dp"
-    android:background="@color/dark_background2"
+    android:background="@color/app_surface"
     android:gravity="center_vertical">
 
     <Button
@@ -12,73 +12,80 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:text="⏮"
-        android:backgroundTint="@color/dark_background2"
-        android:textColor="@color/dark_text"
-        android:padding="0dp" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Précédent"
+        android:padding="6dp" />
 
     <Button
         android:id="@+id/btnPlay"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:text="▶"
-        android:backgroundTint="@color/dark_background2"
-        android:textColor="@color/dark_text"
-        android:layout_marginStart="8dp"
-        android:padding="0dp" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Lire"
+        android:padding="6dp" />
 
     <Button
         android:id="@+id/btnSkipForward"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:text="⏭"
-        android:backgroundTint="@color/dark_background2"
-        android:textColor="@color/dark_text"
-        android:layout_marginStart="8dp"
-        android:padding="0dp" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Suivant"
+        android:padding="6dp" />
 
     <SeekBar
         android:id="@+id/seekBar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="10dp"
         android:layout_weight="1"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:progressTint="@color/dark_mainColor"
-        android:thumbTint="@color/dark_mainColor" />
+        android:padding="6dp"
+        android:progressDrawable="@drawable/seekbar_progress"
+        android:splitTrack="false"
+        android:thumb="@android:color/transparent" />
 
     <TextView
         android:id="@+id/textDuration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:fontFeatureSettings="tnum"
         android:text="0:00 / 0:00"
-        android:textColor="@color/dark_textSecondary"
-        android:textSize="12sp"
-        android:layout_marginEnd="12dp" />
+        android:padding="6dp"
+        android:textColor="@color/app_text_primary"
+        android:textSize="12sp" />
 
     <Button
         android:id="@+id/btnSpeedDown"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:text="−"
-        android:backgroundTint="@color/dark_background2"
-        android:textColor="@color/dark_text"
-        android:padding="0dp" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Ralentir"
+        android:padding="6dp" />
 
     <TextView
         android:id="@+id/textSpeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFeatureSettings="tnum"
+        android:minWidth="40dp"
+        android:gravity="center"
+        android:padding="6dp"
         android:text="100%"
-        android:textColor="@color/dark_text"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp" />
+        android:textColor="@color/app_text_primary"
+        android:textSize="12sp"
+        android:textStyle="bold" />
 
     <Button
         android:id="@+id/btnSpeedUp"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:text="+"
-        android:backgroundTint="@color/dark_background2"
-        android:textColor="@color/dark_text"
-        android:padding="0dp" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Accélérer"
+        android:padding="6dp" />
+
 </LinearLayout>

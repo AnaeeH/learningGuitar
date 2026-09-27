@@ -3,12 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/dark_background">
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/dark_line" />
+    android:background="@color/app_background">
 
     <WebView
         android:id="@+id/youtubeWebView"
@@ -40,16 +35,10 @@
             android:id="@+id/playbackCursor"
             android:layout_width="2dp"
             android:layout_height="match_parent"
-            android:background="@color/dark_mainColor"
+            android:background="@color/app_accent_tab"
             android:layout_gravity="start"
             android:translationX="0dp"/>
-
     </FrameLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/dark_line" />
 
     <include
         android:id="@+id/musicControls"

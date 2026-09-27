@@ -1,6 +1,8 @@
 package com.herbillon.guitar.ui.music;
 
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +15,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -53,6 +56,10 @@ public class TablatureFragment extends AbstractMusicFragment implements Observer
         binding.horizontalScrollView.setVisibility(View.GONE);
         ((MainActivity) requireActivity()).showLoading();
         GuitarAPI.dataTablature = null;
+
+        LayerDrawable progressLayers = (LayerDrawable) binding.musicControls.seekBar.getProgressDrawable();
+        Drawable progressLayer = progressLayers.findDrawableByLayerId(android.R.id.progress);
+        progressLayer.setTint(ContextCompat.getColor(requireContext(), R.color.app_accent_tab));
 
         guitarAPI.addObserver(this);
         guitarAPI.fetchTablature(musicId);
