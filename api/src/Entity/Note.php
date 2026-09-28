@@ -37,9 +37,13 @@ class Note
     #[ORM\OneToMany(targetEntity: Chord::class, mappedBy: 'note')]
     private Collection $chords;
 
+    #[ORM\OneToMany(targetEntity: Scale::class, mappedBy: 'note')]
+    private Collection $scales;
+
     public function __construct()
     {
         $this->chords = new ArrayCollection();
+        $this->scales = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -88,6 +92,30 @@ class Note
         if ($this->chords->removeElement($chord)) {
             if ($chord->getNote() === $this) {
                 $chord->setNote(null);
+            }
+        }
+        return $this;
+    }
+
+    public function getScales(): Collection
+    {
+        return $this->scales;
+    }
+
+    public function addScale(Scale $scale): static
+    {
+        if (!$this->scales->contains($scale)) {
+            $this->scales->add($scale);
+            $scale->setNote($this);
+        }
+        return $this;
+    }
+
+    public function removeScale(Scale $scale): static
+    {
+        if ($this->scales->removeElement($scale)) {
+            if ($scale->getNote() === $this) {
+                $scale->setNote(null);
             }
         }
         return $this;
