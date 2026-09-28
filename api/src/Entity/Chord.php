@@ -12,6 +12,8 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiFilter(SearchFilter::class, properties: [
@@ -44,10 +46,6 @@ class Chord
     #[Groups(['chord:detail'])]
     private ?string $name = null;
 
-    #[ORM\Column(type: 'text', name: 'chr_diagram')]
-    #[Groups(['chord:detail'])]
-    private ?string $diagram = null;
-
     #[ORM\Column(type: "boolean", name: 'chr_ismajor', options: ["default" => true])]
     #[Groups(['chord:detail'])]
     private bool $isMajor = true;
@@ -56,6 +54,36 @@ class Chord
     #[ORM\JoinColumn(nullable: false, name: 'chr_nte_id', referencedColumnName: 'nte_id')]
     #[Groups(['chord:detail'])]
     private ?Note $note = null;
+
+    #[ORM\Column(nullable: true, name: 'chr_barre_fret')]
+    #[Groups(['chord:detail'])]
+    private ?int $barreFret = null;
+
+    #[ORM\Column(nullable: true, name: 'chr_barre_from_string')]
+    #[Groups(['chord:detail'])]
+    private ?int $barreFromString = null;
+
+    #[ORM\Column(nullable: true, name: 'chr_barre_to_string')]
+    #[Groups(['chord:detail'])]
+    private ?int $barreToString = null;
+
+    #[ORM\Column(type: 'simple_array', nullable: true, name: 'chr_muted_strings')]
+    #[Groups(['chord:detail'])]
+    private ?array $mutedStrings = null;
+
+    #[ORM\OneToMany(
+        targetEntity: ChordPosition::class,
+        mappedBy: 'chord',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    #[Groups(['chord:detail'])]
+    private Collection $positions;
+
+    public function __construct()
+    {
+        $this->positions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -70,17 +98,6 @@ class Chord
     public function setName(string $name): static
     {
         $this->name = $name;
-        return $this;
-    }
-
-    public function getDiagram(): ?string
-    {
-        return $this->diagram;
-    }
-
-    public function setDiagram(string $diagram): static
-    {
-        $this->diagram = $diagram;
         return $this;
     }
 
@@ -103,6 +120,77 @@ class Chord
     public function setNote(?Note $note): static
     {
         $this->note = $note;
+        return $this;
+    }
+
+    public function getBarreFret(): ?int
+    {
+        return $this->barreFret;
+    }
+
+    public function setBarreFret(?int $barreFret): static
+    {
+        $this->barreFret = $barreFret;
+        return $this;
+    }
+
+    public function getBarreFromString(): ?int
+    {
+        return $this->barreFromString;
+    }
+
+    public function setBarreFromString(?int $barreFromString): static
+    {
+        $this->barreFromString = $barreFromString;
+        return $this;
+    }
+
+    public function getBarreToString(): ?int
+    {
+        return $this->barreToString;
+    }
+
+    public function setBarreToString(?int $barreToString): static
+    {
+        $this->barreToString = $barreToString;
+        return $this;
+    }
+
+    public function getMutedStrings(): ?array
+    {
+        return $this->mutedStrings;
+    }
+
+    public function setMutedStrings(?array $mutedStrings): static
+    {
+        $this->mutedStrings = $mutedStrings;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ChordPosition>
+     */
+    public function getPositions(): Collection
+    {
+        return $this->positions;
+    }
+
+    public function addPosition(ChordPosition $position): static
+    {
+        if (!$this->positions->contains($position)) {
+            $this->positions->add($position);
+            $position->setChord($this);
+        }
+        return $this;
+    }
+
+    public function removePosition(ChordPosition $position): static
+    {
+        if ($this->positions->removeElement($position)) {
+            if ($position->getChord() === $this) {
+                $position->setChord(null);
+            }
+        }
         return $this;
     }
 }
