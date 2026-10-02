@@ -67,15 +67,8 @@ public class GuitarAPI {
      *
      * @param filter, filter of chords
      */
-    public void fetchChords(String filter) {
+    public void fetchChords() {
         String url = API_BASE_URL + "/chords";
-
-        if (filter.equals("major")) {
-            url += "?isMajor=true";
-        }
-        if (filter.equals("minor")) {
-            url += "?isMajor=false";
-        }
 
         Log.d("GuitarAPI", "fetching chords");
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,

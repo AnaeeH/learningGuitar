@@ -25,7 +25,7 @@ public class ChordAdapter extends RecyclerView.Adapter<ChordAdapter.ChordViewHol
     }
 
     public static class ChordViewHolder extends RecyclerView.ViewHolder {
-        ImageView diagram;
+        ChordDiagramView diagram;
         TextView name;
         TextView label;
 
@@ -50,13 +50,7 @@ public class ChordAdapter extends RecyclerView.Adapter<ChordAdapter.ChordViewHol
         Chord chord = chords.get(position);
         holder.name.setText(chord.getName());
         holder.label.setText(chord.getLabel());
-
-        String base64 = chord.getDiagram();
-        String base64Data = base64.substring(base64.indexOf(",") + 1);
-        byte[] decodedBytes = Base64.decode(base64Data, Base64.DEFAULT);
-        Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-        holder.diagram.setImageBitmap(bitmap);
-        holder.diagram.setColorFilter(android.graphics.Color.WHITE, android.graphics.PorterDuff.Mode.SRC_ATOP);
+        holder.diagram.setChord(chord);
     }
 
     @Override

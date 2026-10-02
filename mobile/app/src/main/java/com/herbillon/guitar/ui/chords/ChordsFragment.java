@@ -21,6 +21,7 @@ import com.herbillon.guitar.R;
 import com.herbillon.guitar.Refreshable;
 import com.herbillon.guitar.databinding.FragmentChordsBinding;
 import com.herbillon.guitar.model.Chord;
+import com.herbillon.guitar.model.ChordPosition;
 import com.herbillon.guitar.network.GuitarAPI;
 
 import org.json.JSONArray;
@@ -33,6 +34,8 @@ import java.util.List;
 public class ChordsFragment extends Fragment implements Observer, Refreshable {
     private FragmentChordsBinding binding;
     private GuitarAPI guitarAPI;
+
+    private List<Chord> allChords = new ArrayList<>();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -48,7 +51,7 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
         binding.recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
         binding.chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            onRefresh();
+            applyFilters();
         });
 
         EditText searchInput = view.findViewById(R.id.searchInput);
@@ -59,55 +62,101 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterChords(s.toString());
+                applyFilters();
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
+
+        guitarAPI.fetchChords();
         return view;
     }
 
-    private void filterChords(String query) {
-        List<Chord> allChords = processDatas();
-        if (query.isEmpty()) {
-            refreshUI(allChords);
-        } else {
-            List<Chord> filtered = new ArrayList<>();
-            for (Chord chord : allChords) {
-                if (chord.getName().toLowerCase().startsWith(query.toLowerCase()) ||
-                        chord.getLabel().toLowerCase().startsWith(query.toLowerCase())) {
-                    filtered.add(chord);
-                }
-            }
-            refreshUI(filtered);
-        }
-    }
-
-    private List<Chord> processDatas() {
+    private void processDatas() {
         JSONArray datas = GuitarAPI.dataChords;
-        if (datas == null){ return null;}
-        List<Chord> chords = new ArrayList<>();
+        if (datas == null) return;
+
+        allChords = new ArrayList<>();
         try {
             for (int i = 0; i < datas.length(); i++) {
-                JSONObject chord = datas.getJSONObject(i);
-                JSONObject note = chord.getJSONObject("note");
-                String label = note.getString("label") + (chord.getBoolean("isMajor") ? " majeur" : " mineur");
-                chords.add(new Chord(
-                        chord.getInt("id"),
-                        chord.getString("name"),
-                        label.substring(0, 1).toUpperCase() + label.substring(1),
-                        chord.getString("diagram")
-                ));
+                JSONObject chordJson = datas.getJSONObject(i);
+                JSONObject note = chordJson.getJSONObject("note");
+
+                boolean isMajor = chordJson.getBoolean("isMajor");
+                String label = note.getString("label") + (isMajor ? " majeur" : " mineur");
+                label = label.substring(0, 1).toUpperCase() + label.substring(1);
+
+                Chord chord = new Chord(
+                        chordJson.getInt("id"),
+                        chordJson.getString("name"),
+                        label,
+                        isMajor
+                );
+
+                if (!chordJson.isNull("barreFret")) {
+                    chord.setBarreFret(chordJson.getInt("barreFret"));
+                    chord.setBarreFromString(chordJson.getInt("barreFromString"));
+                    chord.setBarreToString(chordJson.getInt("barreToString"));
+                }
+
+                if (!chordJson.isNull("mutedStrings")) {
+                    JSONArray mutedArray = chordJson.getJSONArray("mutedStrings");
+                    List<Integer> muted = new ArrayList<>();
+                    for (int j = 0; j < mutedArray.length(); j++) {
+                        muted.add(mutedArray.getInt(j));
+                    }
+                    chord.setMutedStrings(muted);
+                }
+
+                JSONArray positionsArray = chordJson.getJSONArray("positions");
+                List<ChordPosition> positions = new ArrayList<>();
+                for (int j = 0; j < positionsArray.length(); j++) {
+                    JSONObject pos = positionsArray.getJSONObject(j);
+                    positions.add(new ChordPosition(
+                            pos.getInt("string"),
+                            pos.getInt("fret")
+                    ));
+                }
+                chord.setPositions(positions);
+
+                allChords.add(chord);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return chords;
+    }
+
+    private void applyFilters() {
+        if (allChords.isEmpty()) return;
+
+        int selectedId = binding.chipGroup.getCheckedChipId();
+        boolean onlyMajor = selectedId == binding.chipMajor.getId();
+        boolean onlyMinor = selectedId == binding.chipMinor.getId();
+
+        List<Chord> result = new ArrayList<>();
+        for (Chord chord : allChords) {
+            if (onlyMajor && !chord.getIsMajor()) continue;
+            if (onlyMinor && chord.getIsMajor()) continue;
+            result.add(chord);
+        }
+
+        String query = binding.searchBar.searchInput.getText().toString().toLowerCase().trim();
+        if (!query.isEmpty()) {
+            List<Chord> searchFiltered = new ArrayList<>();
+            for (Chord chord : result) {
+                if (chord.getName().toLowerCase().contains(query) ||
+                        chord.getLabel().toLowerCase().contains(query)) {
+                    searchFiltered.add(chord);
+                }
+            }
+            result = searchFiltered;
+        }
+
+        refreshUI(result);
     }
 
     private void refreshUI(List<Chord> chords) {
-        if (chords == null){ return; }
         ((MainActivity) requireActivity()).hideLoading();
         binding.recyclerView.setVisibility(View.VISIBLE);
 
@@ -124,24 +173,14 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
 
     @Override
     public void onChanged(Object o) {
-        binding.recyclerView.setVisibility(View.GONE);
-        ((MainActivity) requireActivity()).showLoading();
-
-        String query = binding.searchBar.searchInput.getText().toString();
-        filterChords(query);
+        processDatas();
+        applyFilters();
     }
 
     @Override
     public void onRefresh() {
         binding.recyclerView.setVisibility(View.GONE);
         ((MainActivity) requireActivity()).showLoading();
-        int selectedId = binding.chipGroup.getCheckedChipId();
-        String filter = "";
-        if (selectedId == binding.chipMajor.getId()) {
-            filter = "major";
-        } else if (selectedId == binding.chipMinor.getId()) {
-            filter = "minor";
-        }
-        guitarAPI.fetchChords(filter);
+        guitarAPI.fetchChords();
     }
 }

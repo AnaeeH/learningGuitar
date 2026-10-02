@@ -11,12 +11,10 @@
     android:orientation="vertical"
     android:padding="12dp">
 
-    <ImageView
+    <com.herbillon.guitar.ui.chords.ChordDiagramView
         android:id="@+id/chordDiagram"
-        android:layout_width="110dp"
-        android:layout_height="110dp"
-        android:padding="4dp"
-        android:scaleType="centerInside" />
+        android:layout_width="match_parent"
+        android:layout_height="150dp" />
 
     <TextView
         android:id="@+id/chordName"

@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
             startWakeupCountdown(app);
         } else {
             // wakeup already played this session, fetch immediately
-            app.guitarAPI.fetchChords("");
+            app.guitarAPI.fetchChords();
             app.guitarAPI.fetchMusics("recent", false, false, null, null);
             app.guitarAPI.fetchMusicLastPlayed();
         }
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFinish() {
                 hideLoading();
                 wakeupContainer.setVisibility(View.GONE);
-                app.guitarAPI.fetchChords("");
+                app.guitarAPI.fetchChords();
                 app.guitarAPI.fetchMusics("recent", false, false, null, null);
                 app.guitarAPI.fetchMusicLastPlayed();
             }
