@@ -69,7 +69,9 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
             public void afterTextChanged(Editable s) {}
         });
 
-        guitarAPI.fetchChords();
+        if (GuitarAPI.dataChords == null) {
+            guitarAPI.fetchChords();
+        }
         return view;
     }
 

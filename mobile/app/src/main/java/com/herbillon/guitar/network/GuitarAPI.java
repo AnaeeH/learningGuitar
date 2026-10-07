@@ -27,6 +27,7 @@ public class GuitarAPI {
     //static final String API_BASE_URL = "http://192.168.1.26:8000/api";
 
     public static JSONArray dataChords = null;
+    public static JSONArray dataScales = null;
     public static JSONArray dataSongs = null;
     public static JSONObject dataSong = null;
     public static JSONObject dataSongLastPlayed = null;
@@ -63,9 +64,7 @@ public class GuitarAPI {
     }
 
     /**
-     * Fetches all chords that match the selected filter
-     *
-     * @param filter, filter of chords
+     * Fetches all chords
      */
     public void fetchChords() {
         String url = API_BASE_URL + "/chords";
@@ -76,6 +75,32 @@ public class GuitarAPI {
                 response -> {
                     Log.d("GuitarAPI", "datas received : " + response);
                     dataChords = response;
+                    liveData.setValue(this);
+                }, error -> Log.e("GuitarAPI", error.toString())
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+                return headers;
+            }
+        };
+        requestQueue.add(request);
+    }
+
+    /**
+     * Fetches all scales
+     */
+    public void fetchScales() {
+        String url = API_BASE_URL + "/scales";
+
+        Log.d("GuitarAPI", "fetching scales");
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,
+                url, null,
+                response -> {
+                    Log.d("GuitarAPI", "datas received : " + response);
+                    dataScales = response;
                     liveData.setValue(this);
                 }, error -> Log.e("GuitarAPI", error.toString())
         ) {

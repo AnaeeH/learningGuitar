@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // wakeup already played this session, fetch immediately
             app.guitarAPI.fetchChords();
+            app.guitarAPI.fetchScales();
             app.guitarAPI.fetchMusics("recent", false, false, null, null);
             app.guitarAPI.fetchMusicLastPlayed();
         }

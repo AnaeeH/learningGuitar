@@ -2,5 +2,6 @@
     <string name="app_name">Guitar</string>
 
     <string name="search_chord">Rechercher un accord (ex: Cmaj7, Am…)</string>
+    <string name="search_scale">Rechercher une gamme (ex: Pentatonique…)</string>
     <string name="search_music">Rechercher un morceau, un artiste…</string>
 </resources>

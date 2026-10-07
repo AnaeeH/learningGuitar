@@ -7,6 +7,11 @@
         android:title="Chords" />
 
     <item
+        android:id="@+id/nav_scales"
+        android:icon="@drawable/ic_scales"
+        android:title="Scales" />
+
+    <item
         android:id="@+id/nav_musics"
         android:icon="@drawable/ic_musics"
         android:title="Musics" />
