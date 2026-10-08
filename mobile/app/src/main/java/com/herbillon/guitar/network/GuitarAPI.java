@@ -3,6 +3,7 @@ package com.herbillon.guitar.network;
 import android.content.Context;
 import android.util.Log;
 
+import com.herbillon.guitar.BuildConfig;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
@@ -23,8 +24,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 public class GuitarAPI {
-    public static final String API_BASE_URL = "https://guitarapi-yl09.onrender.com/api";
-    //static final String API_BASE_URL = "http://192.168.1.26:8000/api";
+    public static final String API_BASE_URL = BuildConfig.API_BASE_URL;
 
     public static JSONArray dataChords = null;
     public static JSONArray dataScales = null;

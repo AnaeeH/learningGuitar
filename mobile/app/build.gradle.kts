@@ -1,3 +1,12 @@
+import java.util.Properties
+
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+val devApiUrl = localProps.getProperty("api.dev.url", "http://10.0.2.2:8000/api")
+val prodApiUrl = "https://guitarapi-yl09.onrender.com/api"
+
 plugins {
     alias(libs.plugins.android.application)
 }
@@ -21,12 +30,22 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".dev"
+            buildConfigField("String", "API_BASE_URL", "\"$devApiUrl\"")
+        }
+        create("prod") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ""
+            buildConfigField("String", "API_BASE_URL", "\"$prodApiUrl\"")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "API_BASE_URL", "\"$prodApiUrl\"")
         }
     }
     compileOptions {
@@ -36,6 +55,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
