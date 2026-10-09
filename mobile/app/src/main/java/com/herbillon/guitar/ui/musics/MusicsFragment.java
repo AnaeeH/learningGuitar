@@ -147,7 +147,7 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
 
     private String getSpinnerValue(Spinner spinner, String[][] values) {
         int pos = spinner.getSelectedItemPosition();
-        return pos == 0 ? null : values[pos][0];
+        return pos <= 0 ? null : values[pos][0];
     }
 
     private void setupSortButton() {
@@ -301,10 +301,12 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
         int selectedIdRiff = binding.chipGroupRiff.getCheckedChipId();
         boolean inFavorite = selectedIdFavorite == binding.chipFavorite.getId();
         boolean inRiff = selectedIdRiff == binding.chipRiff.getId();
+        String status = getSpinnerValue(binding.spinnerStatus, MusicConstants.STATUS_VALUES);
+        String difficulty = getSpinnerValue(binding.spinnerDifficulty, MusicConstants.DIFFICULTY_VALUES);
 
         MusicAdapter adapter = new MusicAdapter(
                 musics,
-                (music) -> guitarAPI.patchMusicFavorite(currentSort, music.getId(), music.getFavorite(), inFavorite, inRiff),
+                (music) -> guitarAPI.patchMusicFavorite(currentSort, music.getId(), music.getFavorite(), inFavorite, inRiff, status, difficulty),
                 (music) -> {
                     Bundle bundle = new Bundle();
                     bundle.putInt("musicId", music.getId());

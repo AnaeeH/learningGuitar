@@ -279,8 +279,10 @@ public class GuitarAPI {
      * @param favorite,   a boolean true or false
      * @param inFavorite, a boolean value of its previous value
      * @param inRiff,     boolean value for the riff
+     * @param status,     the status selected
+     * @param difficulty, the difficulty selected
      */
-    public void patchMusicFavorite(String sort, int id, boolean favorite, boolean inFavorite, boolean inRiff) {
+    public void patchMusicFavorite(String sort, int id, boolean favorite, boolean inFavorite, boolean inRiff, String status, String difficulty) {
         String url = API_BASE_URL + "/patch/music/" + id + "/favorite";
 
         JSONObject body = new JSONObject();
@@ -295,7 +297,7 @@ public class GuitarAPI {
                 url, body,
                 response -> {
                     Log.d("GuitarAPI", "datas received : " + response);
-                    fetchMusics(sort, inFavorite, inRiff, null, null);
+                    fetchMusics(sort, inFavorite, inRiff, status, difficulty);
                     liveData.setValue(this);
                 }, error -> {
             if (error.networkResponse != null) {
