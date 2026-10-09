@@ -4,4 +4,9 @@
     <string name="search_chord">Rechercher un accord (ex: Cmaj7, Am…)</string>
     <string name="search_scale">Rechercher une gamme (ex: Pentatonique…)</string>
     <string name="search_music">Rechercher un morceau, un artiste…</string>
+
+    <plurals name="music_count">
+        <item quantity="one">%d musique</item>
+        <item quantity="other">%d musiques</item>
+    </plurals>
 </resources>

@@ -294,6 +294,9 @@ public class MusicsFragment extends Fragment implements Observer, Refreshable {
         ((MainActivity) requireActivity()).hideLoading();
         binding.recyclerView.setVisibility(View.VISIBLE);
 
+        binding.textMusicCount.setText(
+                getResources().getQuantityString(R.plurals.music_count, musics.size(), musics.size()));
+
         int selectedIdFavorite = binding.chipGroupFavorite.getCheckedChipId();
         int selectedIdRiff = binding.chipGroupRiff.getCheckedChipId();
         boolean inFavorite = selectedIdFavorite == binding.chipFavorite.getId();
