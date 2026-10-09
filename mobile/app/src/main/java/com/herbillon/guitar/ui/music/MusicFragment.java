@@ -1,10 +1,8 @@
 package com.herbillon.guitar.ui.music;
 
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.Navigation;
@@ -25,8 +23,11 @@ import com.herbillon.guitar.GuitarApp;
 import com.herbillon.guitar.MainActivity;
 import com.herbillon.guitar.Refreshable;
 import com.herbillon.guitar.databinding.FragmentMusicBinding;
+import com.herbillon.guitar.model.Chord;
 import com.herbillon.guitar.model.Music;
 import com.herbillon.guitar.network.GuitarAPI;
+import com.herbillon.guitar.ui.chords.ChordParser;
+import com.herbillon.guitar.ui.chords.ChordZoomDialog;
 import com.herbillon.guitar.utils.MusicConstants;
 
 import org.json.JSONArray;
@@ -34,6 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MusicFragment extends Fragment implements Observer, Refreshable {
@@ -44,6 +46,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
     private Music music;
     private int musicId;
     private String[] musicChords;
+    private final Map<String, Chord> chordsByName = new HashMap<>();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -83,6 +86,10 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
             Navigation.findNavController(v)
                     .navigate(com.herbillon.guitar.R.id.actionMusicFragToTablatureFrag, args);
         });
+
+        if (GuitarAPI.dataChords == null) {
+            guitarAPI.fetchChords();
+        }
         return view;
     }
 
@@ -90,7 +97,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
 
         Map<Integer, String> mapping = new HashMap<>();
         for (String[] entry : MusicConstants.DIFFICULTY_VALUES) {
-            if (!entry[0].isEmpty()){
+            if (!entry[0].isEmpty()) {
                 Chip chip = (Chip) LayoutInflater.from(requireContext())
                         .inflate(R.layout.item_chip_filter, chipGroup, false);
                 chip.setText(entry[1]);
@@ -159,12 +166,14 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
     }
 
     private void refreshUI() {
-        if (music == null){ return; }
+        if (music == null) {
+            return;
+        }
         ((MainActivity) requireActivity()).hideLoading();
         binding.scrollContent.setVisibility(View.VISIBLE);
 
         ((TextView) composants.get("BPM")).setText(music.getTempo() + " BPM · " + music.getTimeSignature());
-        if (music.getComment() != null){
+        if (music.getComment() != null) {
             ((TextView) composants.get("comment")).setText("" + music.getComment());
         } else {
             ((TextView) composants.get("comment")).setText("");
@@ -179,7 +188,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
             }
         });
 
-        if (music.getFavorite()){
+        if (music.getFavorite()) {
             ((ImageView) composants.get("iconFavorite")).setVisibility(View.VISIBLE);
             ((TextView) composants.get("textFavorite")).setVisibility(View.VISIBLE);
         } else {
@@ -187,7 +196,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
             ((TextView) composants.get("textFavorite")).setVisibility(View.INVISIBLE);
         }
 
-        if (music.getRiff()){
+        if (music.getRiff()) {
             ((ImageView) composants.get("iconRiff")).setVisibility(View.VISIBLE);
             ((TextView) composants.get("textRiff")).setVisibility(View.VISIBLE);
         } else {
@@ -195,7 +204,7 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
             ((TextView) composants.get("textRiff")).setVisibility(View.INVISIBLE);
         }
 
-        if (musicChords == null || musicChords.length == 0){
+        if (musicChords == null || musicChords.length == 0) {
             ((TextView) composants.get("titleChords")).setVisibility(View.GONE);
             ((ChipGroup) composants.get("textChords")).setVisibility(View.GONE);
         } else {
@@ -203,12 +212,23 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
             ((ChipGroup) composants.get("textChords")).setVisibility(View.VISIBLE);
             binding.chipGroupChords.removeAllViews();
 
+            Log.d("ChordZoom", "dataChords null? " + (GuitarAPI.dataChords == null)
+                    + " | parsed: " + ChordParser.parseChords(GuitarAPI.dataChords).size());
+
+            List<Chord> allChords = ChordParser.parseChords(GuitarAPI.dataChords);
             for (String chordName : musicChords) {
                 Chip chip = (Chip) LayoutInflater.from(requireContext())
                         .inflate(R.layout.item_chip_filter, binding.chipGroupChords, false);
                 chip.setText(chordName);
                 chip.setCheckable(false);
-                chip.setClickable(false);
+                chip.setOnClickListener(v -> {
+                    for (Chord c : allChords) {
+                        if (c.getName().equals(chordName)) {
+                            ChordZoomDialog.show(requireContext(), c);
+                            break;
+                        }
+                    }
+                });
                 binding.chipGroupChords.addView(chip);
             }
         }
@@ -222,7 +242,8 @@ public class MusicFragment extends Fragment implements Observer, Refreshable {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {

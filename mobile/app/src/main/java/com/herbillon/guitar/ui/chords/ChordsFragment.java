@@ -85,55 +85,7 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
     private void processDatas() {
         JSONArray datas = GuitarAPI.dataChords;
         if (datas == null) return;
-
-        allChords = new ArrayList<>();
-        try {
-            for (int i = 0; i < datas.length(); i++) {
-                JSONObject chordJson = datas.getJSONObject(i);
-                JSONObject note = chordJson.getJSONObject("note");
-
-                boolean isMajor = chordJson.getBoolean("isMajor");
-                String label = note.getString("label") + (isMajor ? " majeur" : " mineur");
-                label = label.substring(0, 1).toUpperCase() + label.substring(1);
-
-                Chord chord = new Chord(
-                        chordJson.getInt("id"),
-                        chordJson.getString("name"),
-                        label,
-                        isMajor
-                );
-
-                if (!chordJson.isNull("barreFret")) {
-                    chord.setBarreFret(chordJson.getInt("barreFret"));
-                    chord.setBarreFromString(chordJson.getInt("barreFromString"));
-                    chord.setBarreToString(chordJson.getInt("barreToString"));
-                }
-
-                if (!chordJson.isNull("mutedStrings")) {
-                    JSONArray mutedArray = chordJson.getJSONArray("mutedStrings");
-                    List<Integer> muted = new ArrayList<>();
-                    for (int j = 0; j < mutedArray.length(); j++) {
-                        muted.add(mutedArray.getInt(j));
-                    }
-                    chord.setMutedStrings(muted);
-                }
-
-                JSONArray positionsArray = chordJson.getJSONArray("positions");
-                List<ChordPosition> positions = new ArrayList<>();
-                for (int j = 0; j < positionsArray.length(); j++) {
-                    JSONObject pos = positionsArray.getJSONObject(j);
-                    positions.add(new ChordPosition(
-                            pos.getInt("string"),
-                            pos.getInt("fret")
-                    ));
-                }
-                chord.setPositions(positions);
-
-                allChords.add(chord);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        allChords = ChordParser.parseChords(datas);
     }
 
     private void applyFilters() {
@@ -165,22 +117,11 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
         refreshUI(result);
     }
 
-    private void openChordZoom(Chord chord) {
-        Dialog dialog = new Dialog(requireContext(), R.style.ZoomDialog);
-        View root = getLayoutInflater().inflate(R.layout.dialog_chord, null);
-        ((ChordDiagramView) root.findViewById(R.id.dialogChordDiagram)).setChord(chord);
-        ((TextView) root.findViewById(R.id.dialogChordName)).setText(chord.getName());
-        ((TextView) root.findViewById(R.id.dialogChordLabel)).setText(chord.getLabel());
-        root.setOnClickListener(v -> dialog.dismiss());
-        dialog.setContentView(root);
-        dialog.show();
-    }
-
     private void refreshUI(List<Chord> chords) {
         ((MainActivity) requireActivity()).hideLoading();
         binding.recyclerView.setVisibility(View.VISIBLE);
 
-        ChordAdapter adapter = new ChordAdapter(chords, this::openChordZoom);
+        ChordAdapter adapter = new ChordAdapter(chords, chord -> ChordZoomDialog.show(requireContext(), chord));
         binding.recyclerView.setAdapter(adapter);
     }
 
