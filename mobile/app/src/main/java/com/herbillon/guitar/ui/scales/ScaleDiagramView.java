@@ -89,7 +89,7 @@ public class ScaleDiagramView extends View {
             canvas.drawLine(x, padTop, x, padTop + gridHeight, stringPaint);
         }
 
-        for (int i = 0; i <= FRET_COUNT; i++) {
+        for (int i = 0; i <= FRET_COUNT-1; i++) {
             float y = padTop + i * fretSpacing;
             canvas.drawLine(padX, y, padX + gridWidth, y, stringPaint);
         }

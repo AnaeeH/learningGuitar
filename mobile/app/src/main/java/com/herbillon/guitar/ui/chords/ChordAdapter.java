@@ -1,12 +1,8 @@
 package com.herbillon.guitar.ui.chords;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,12 +12,15 @@ import com.herbillon.guitar.R;
 import com.herbillon.guitar.model.Chord;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ChordAdapter extends RecyclerView.Adapter<ChordAdapter.ChordViewHolder> {
     private List<Chord> chords;
+    private final Consumer<Chord> onChordClick;
 
-    public ChordAdapter(List<Chord> c) {
+    public ChordAdapter(List<Chord> c, Consumer<Chord> onChordClick) {
         this.chords = c;
+        this.onChordClick = onChordClick;
     }
 
     public static class ChordViewHolder extends RecyclerView.ViewHolder {
@@ -51,6 +50,7 @@ public class ChordAdapter extends RecyclerView.Adapter<ChordAdapter.ChordViewHol
         holder.name.setText(chord.getName());
         holder.label.setText(chord.getLabel());
         holder.diagram.setChord(chord);
+        holder.itemView.setOnClickListener(v -> onChordClick.accept(chord));
     }
 
     @Override

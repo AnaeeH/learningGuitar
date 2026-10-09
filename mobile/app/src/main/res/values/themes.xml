@@ -37,4 +37,13 @@
         <item name="android:textSize">14sp</item>
         <item name="chipMinHeight">40dp</item>
     </style>
+
+    <style name="ZoomAnimation">
+        <item name="android:windowEnterAnimation">@anim/zoom_in</item>
+        <item name="android:windowExitAnimation">@anim/zoom_out</item>
+    </style>
+
+    <style name="ZoomDialog" parent="@android:style/Theme.Translucent.NoTitleBar">
+        <item name="android:windowAnimationStyle">@style/ZoomAnimation</item>
+    </style>
 </resources>

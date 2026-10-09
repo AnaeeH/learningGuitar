@@ -15,6 +15,7 @@ import com.herbillon.guitar.model.ScalePosition;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class ScaleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -28,13 +29,16 @@ public class ScaleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private final List<Object> items;
     private final Set<Integer> collapsedScaleIds;
     private final OnScaleHeaderClickListener headerClickListener;
+    private final Consumer<ScalePosition> onScaleClick;
 
     public ScaleAdapter(List<Object> items,
                         Set<Integer> collapsedScaleIds,
-                        OnScaleHeaderClickListener headerClickListener) {
+                        OnScaleHeaderClickListener headerClickListener,
+                        Consumer<ScalePosition> onScaleClick) {
         this.items = items;
         this.collapsedScaleIds = collapsedScaleIds;
         this.headerClickListener = headerClickListener;
+        this.onScaleClick = onScaleClick;
     }
 
     public static class HeaderViewHolder extends RecyclerView.ViewHolder {
@@ -105,6 +109,7 @@ public class ScaleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             h.name.setText("Position " + pos.getNumber());
             h.label.setText("Frette " + pos.getStartingFret());
             h.diagram.setPosition(pos);
+            holder.itemView.setOnClickListener(v -> onScaleClick.accept(pos));
         }
     }
 

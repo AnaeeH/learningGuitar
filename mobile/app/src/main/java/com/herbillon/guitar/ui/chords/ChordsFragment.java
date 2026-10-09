@@ -1,5 +1,6 @@
 package com.herbillon.guitar.ui.chords;
 
+import android.app.Dialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,11 +11,17 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.herbillon.guitar.GuitarApp;
 import com.herbillon.guitar.MainActivity;
 import com.herbillon.guitar.R;
@@ -158,11 +165,22 @@ public class ChordsFragment extends Fragment implements Observer, Refreshable {
         refreshUI(result);
     }
 
+    private void openChordZoom(Chord chord) {
+        Dialog dialog = new Dialog(requireContext(), R.style.ZoomDialog);
+        View root = getLayoutInflater().inflate(R.layout.dialog_chord, null);
+        ((ChordDiagramView) root.findViewById(R.id.dialogChordDiagram)).setChord(chord);
+        ((TextView) root.findViewById(R.id.dialogChordName)).setText(chord.getName());
+        ((TextView) root.findViewById(R.id.dialogChordLabel)).setText(chord.getLabel());
+        root.setOnClickListener(v -> dialog.dismiss());
+        dialog.setContentView(root);
+        dialog.show();
+    }
+
     private void refreshUI(List<Chord> chords) {
         ((MainActivity) requireActivity()).hideLoading();
         binding.recyclerView.setVisibility(View.VISIBLE);
 
-        ChordAdapter adapter = new ChordAdapter(chords);
+        ChordAdapter adapter = new ChordAdapter(chords, this::openChordZoom);
         binding.recyclerView.setAdapter(adapter);
     }
 

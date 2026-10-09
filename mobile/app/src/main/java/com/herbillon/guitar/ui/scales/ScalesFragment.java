@@ -1,5 +1,6 @@
 package com.herbillon.guitar.ui.scales;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -18,10 +20,12 @@ import com.herbillon.guitar.MainActivity;
 import com.herbillon.guitar.R;
 import com.herbillon.guitar.Refreshable;
 import com.herbillon.guitar.databinding.FragmentScalesBinding;
+import com.herbillon.guitar.model.Chord;
 import com.herbillon.guitar.model.Scale;
 import com.herbillon.guitar.model.ScaleNote;
 import com.herbillon.guitar.model.ScalePosition;
 import com.herbillon.guitar.network.GuitarAPI;
+import com.herbillon.guitar.ui.chords.ChordDiagramView;
 import com.herbillon.guitar.ui.scales.ScaleAdapter;
 
 import org.json.JSONArray;
@@ -153,11 +157,22 @@ public class ScalesFragment extends Fragment implements Observer, Refreshable {
         refreshUI(items);
     }
 
+    private void openScaleZoom(ScalePosition scalePos) {
+        Dialog dialog = new Dialog(requireContext(), R.style.ZoomDialog);
+        View root = getLayoutInflater().inflate(R.layout.dialog_scale, null);
+        ((ScaleDiagramView) root.findViewById(R.id.dialogScaleDiagram)).setPosition(scalePos);
+        ((TextView) root.findViewById(R.id.dialogScalePosition)).setText("Position " + scalePos.getNumber());
+        ((TextView) root.findViewById(R.id.dialogScaleFret)).setText("Frette " + scalePos.getStartingFret());
+        root.setOnClickListener(v -> dialog.dismiss());
+        dialog.setContentView(root);
+        dialog.show();
+    }
+
     private void refreshUI(List<Object> scales) {
         ((MainActivity) requireActivity()).hideLoading();
         binding.recyclerView.setVisibility(View.VISIBLE);
 
-        ScaleAdapter adapter = new ScaleAdapter(scales, collapsedScaleIds, this::onScaleHeaderClick);
+        ScaleAdapter adapter = new ScaleAdapter(scales, collapsedScaleIds, this::onScaleHeaderClick, this::openScaleZoom);
         binding.recyclerView.setAdapter(adapter);
         layoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(SPAN_COUNT));
     }
