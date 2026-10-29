@@ -9,6 +9,8 @@ public class Beat {
     public boolean tied;
     public boolean hammerOn;
     public boolean pullOff;
+    public boolean slide;
+    public boolean palmMute;
 
     // Partition
     public String pitchStep;

@@ -31,6 +31,8 @@ public class MusicParser {
                 beat.tied = bObj.optBoolean("tied");
                 beat.hammerOn = bObj.optBoolean("hammerOn");
                 beat.pullOff = bObj.optBoolean("pullOff");
+                beat.slide = bObj.optBoolean("slide");
+                beat.palmMute = bObj.optBoolean("palmMute");
                 beat.position = bObj.getInt("position");
                 beat.duration = bObj.getInt("duration");
                 beat.type = bObj.getString("type");
