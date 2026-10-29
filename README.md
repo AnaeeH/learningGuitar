@@ -29,9 +29,9 @@ DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&ch
 ```
 > Le fichier `.env` est commité mais ne contient que des valeurs d'exemple (`CHANGE_ME`). Les vrais secrets ne doivent jamais y figurer.
 
-**4. Démarrer la base de données** (Docker)
+**4. Démarrer la base de données** (Docker + Interface)
 ```bash
-docker compose up -d database
+docker compose up -d database adminer
 ```
 
 **5. Initialiser la base de dev** (à faire une seule fois)
@@ -59,7 +59,8 @@ symfony serve --no-tls --listen-ip=0.0.0.0
 | Service              | URL                                           |
 |----------------------|-----------------------------------------------|
 | API (Swagger UI)     | http://127.0.0.1:8000/api                     |
-| Base PostgreSQL      | `127.0.0.1:5432` (base `app`, utilisateur `app`) |
+| Base PostgreSQL      | `127.0.0.1:5432` (base: `app`, utilisateur: `app`) |
+| Adminer (interface web de la base de dev) | http://127.0.0.1:8081 |
 | API de production    | https://guitarapi-yl09.onrender.com/api       |
 
 La base de dev démarre sans aucune musique : voir [Importer une musique](#importer-une-musique).
@@ -69,17 +70,26 @@ La base de dev démarre sans aucune musique : voir [Importer une musique](#impor
 ## Docker
 
 ```bash
-docker compose up -d database    # Démarrer la base
-docker compose stop              # L'arrêter sans rien perdre (les données restent)
-docker compose down -v           # L'arrêter ET effacer les données
-docker compose ps                # Voir si elle tourne
+docker compose up -d database adminer   # Démarrer la base et Adminer
+docker compose stop                     # L'arrêter sans rien perdre (les données restent)
+docker compose down -v                  # L'arrêter ET effacer les données
+docker compose ps                       # Voir si elle tourne
 ```
 
-**Consulter la base**
-```bash
-docker compose exec database psql -U app -d app
-```
-Commandes utiles dans `psql` : `\dt` (liste des tables), `SELECT * FROM t_chord_chr;`, `\q` (quitter).
+**Consulter la base avec Adminer** : 
+Ouvrir http://127.0.0.1:8081 et se connecter avec :
+
+| Champ | Valeur |
+|---|---|
+| Système | `PostgreSQL` |
+| Serveur | `database` |
+| Utilisateur | `app` |
+| Mot de passe | celui de `.env.local` (par défaut `!ChangeMe!`) |
+| Base de données | `app` |
+
+> Le serveur est `database` (le nom du service Docker) et non `127.0.0.1`, car Adminer tourne dans son propre conteneur.
+
+Pour la base de prod, utiliser le *Table Editor* de Supabase.
 
 ---
 
@@ -193,7 +203,7 @@ api.dev.url=http://192.168.1.1:8000/api
 2. Cliquer sur **Run**. Android Studio construit, installe et lance l'appli.
 **Avec `debug`**, démarrer d'abord la base et l'API sur l'ordinateur :
 ```bash
-docker compose up -d database
+docker compose up -d database adminer
 symfony serve --no-tls --listen-ip=0.0.0.0
 ```
 Le `--listen-ip=0.0.0.0` est indispensable pour qu'un téléphone puisse joindre l'API.
