@@ -96,11 +96,11 @@ class SeedScalesCommand extends Command
             [
                 'name' => 'Pentatonique mineure',
                 'type' => 'pentatonic',
-                'note' => 'A',
+                'note' => 'F',
                 'positions' => [
                     [
                         'number' => 1,
-                        'startFret' => 5,
+                        'startFret' => 1,
                         'notes' => [
                             [6, 1, true],  [6, 4, false],
                             [5, 1, false], [5, 3, false],
@@ -112,7 +112,7 @@ class SeedScalesCommand extends Command
                     ],
                     [
                         'number' => 2,
-                        'startFret' => 7,
+                        'startFret' => 3,
                         'notes' => [
                             [6, 2, false], [6, 4, false],
                             [5, 1, false], [5, 4, false],
@@ -124,7 +124,7 @@ class SeedScalesCommand extends Command
                     ],
                     [
                         'number' => 3,
-                        'startFret' => 9,
+                        'startFret' => 5,
                         'notes' => [
                             [6, 2, false], [6, 4, false],
                             [5, 2, false], [5, 4, true],
@@ -136,7 +136,7 @@ class SeedScalesCommand extends Command
                     ],
                     [
                         'number' => 4,
-                        'startFret' => 12,
+                        'startFret' => 8,
                         'notes' => [
                             [6, 1, false], [6, 4, false],
                             [5, 1, true],  [5, 4, false],
@@ -148,7 +148,7 @@ class SeedScalesCommand extends Command
                     ],
                     [
                         'number' => 5,
-                        'startFret' => 14,
+                        'startFret' => 10,
                         'notes' => [
                             [6, 2, false], [6, 4, true],
                             [5, 2, false], [5, 4, false],
