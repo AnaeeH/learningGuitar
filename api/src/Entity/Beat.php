@@ -53,6 +53,14 @@ class Beat
     #[Groups(['music:partition', 'music:tablature'])]
     private bool $pullOff = false;
 
+    #[ORM\Column(name: 'bea_slide', options: ['default' => false])]
+    #[Groups(['music:partition', 'music:tablature'])]
+    private bool $slide = false;
+
+    #[ORM\Column(name: 'bea_palm_mute', options: ['default' => false])]
+    #[Groups(['music:partition', 'music:tablature'])]
+    private bool $palmMute = false;
+
     #[ORM\Column(name: 'bea_dot')]
     #[Groups(['music:partition', 'music:tablature'])]
     private ?bool $dot = false;
@@ -190,6 +198,30 @@ class Beat
     public function setPullOff(?bool $pullOff): static
     {
         $this->pullOff = $pullOff;
+
+        return $this;
+    }
+
+    public function getSlide(): ?bool
+    {
+        return $this->slide;
+    }
+
+    public function setSlide(?bool $slide): static
+    {
+        $this->slide = $slide;
+
+        return $this;
+    }
+
+    public function getPalmMute(): ?bool
+    {
+        return $this->palmMute;
+    }
+
+    public function setPalmMute(?bool $palmMute): static
+    {
+        $this->palmMute = $palmMute;
 
         return $this;
     }
