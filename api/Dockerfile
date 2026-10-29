@@ -16,9 +16,9 @@ ENV APP_ENV=prod
 
 RUN composer install --no-dev --optimize-autoloader
 
-RUN mkdir -p var/cache var/log \
-    && chown -R www-data:www-data var/ \
-    && chmod -R 775 var/
+RUN mkdir -p var/cache var/log public/xml public/audio \
+    && chown -R www-data:www-data var/ public/xml public/audio \
+    && chmod -R 775 var/ public/xml public/audio
 
 RUN APP_ENV=prod php bin/console cache:warmup
 
