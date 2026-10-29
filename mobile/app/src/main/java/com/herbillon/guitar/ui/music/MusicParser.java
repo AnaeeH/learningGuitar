@@ -54,4 +54,25 @@ public class MusicParser {
         }
         return measures;
     }
+
+    // A slide goes from its start note to the next note played on the same string
+    private static void linkSlides(List<Measure> measures) {
+        List<Beat> all = new ArrayList<>();
+        for (Measure m : measures) {
+            all.addAll(m.beats);
+        }
+
+        for (int i = 0; i < all.size(); i++) {
+            Beat from = all.get(i);
+            if (!from.slide || from.string == -1) continue;
+
+            from.slideUp = true;
+            for (int j = i + 1; j < all.size(); j++) {
+                Beat to = all.get(j);
+                if (to.isRest || to.tied || to.string != from.string) continue;
+                from.slideUp = to.fret > from.fret;
+                break;
+            }
+        }
+    }
 }

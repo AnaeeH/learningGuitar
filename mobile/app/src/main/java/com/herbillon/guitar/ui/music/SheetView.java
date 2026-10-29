@@ -249,14 +249,25 @@ public class SheetView extends View {
         float yBottom = yStart + (maxString - 1) * lineSpacing;
         float padding = lineSpacing * 0.4f;
 
-        // Vertical bar
-        barPaint.setStrokeWidth(35f);
-        barPaint.setColor(colorChords);
-        barPaint.setStrokeCap(Paint.Cap.ROUND);
-        canvas.drawLine(x, yTop + padding, x, yBottom - padding, barPaint);
-        barPaint.setColor(colorSecondary);
-        barPaint.setStrokeCap(Paint.Cap.BUTT);
-        barPaint.setStrokeWidth(2f);
+        boolean muted = false;
+        for (Beat beat : beats) {
+            if (beat.palmMute) {
+                muted = true;
+                break;
+            }
+        }
+        if (muted) {
+            drawCross(canvas, x, (yTop + yBottom) / 2f, lineSpacing * 0.25f, lineSpacing * 0.6f);
+        } else {
+            // Vertical bar
+            barPaint.setStrokeWidth(35f);
+            barPaint.setColor(colorChords);
+            barPaint.setStrokeCap(Paint.Cap.ROUND);
+            canvas.drawLine(x, yTop + padding, x, yBottom - padding, barPaint);
+            barPaint.setColor(colorSecondary);
+            barPaint.setStrokeCap(Paint.Cap.BUTT);
+            barPaint.setStrokeWidth(2f);
+        }
 
         // Chord name
         chordNamePaint.setTextSize(lineSpacing * 0.6f);
@@ -268,6 +279,17 @@ public class SheetView extends View {
             String symbol = "down".equals(strumDirection) ? "↓" : "↑";
             canvas.drawText(symbol, x, yBottom + lineSpacing * 1.2f, chordNamePaint);
         }
+    }
+
+    private void drawCross(Canvas canvas, float cx, float cy, float halfWidth, float halfHeight) {
+        barPaint.setStrokeWidth(10f);
+        barPaint.setColor(colorChords);
+        barPaint.setStrokeCap(Paint.Cap.ROUND);
+        canvas.drawLine(cx - halfWidth, cy - halfHeight, cx + halfWidth, cy + halfHeight, barPaint);
+        canvas.drawLine(cx - halfWidth, cy + halfHeight, cx + halfWidth, cy - halfHeight, barPaint);
+        barPaint.setColor(colorSecondary);
+        barPaint.setStrokeCap(Paint.Cap.BUTT);
+        barPaint.setStrokeWidth(2f);
     }
 
     private void drawSingleNote(Canvas canvas, float x, float yStart, float lineSpacing, Beat beat, Beat previousBeat) {
@@ -283,6 +305,9 @@ public class SheetView extends View {
             label = "(" + previousBeat.fret + ") " + beat.fret;
         } else {
             label = String.valueOf(beat.fret);
+        }
+        if (beat.slide) {
+            label += beat.slideUp ? "/" : "\\";
         }
 
         float halfW = fretPaint.measureText(label) / 4f + lineSpacing * 0.25f;
@@ -303,14 +328,18 @@ public class SheetView extends View {
         noteText.setTypeface(Typeface.DEFAULT_BOLD);
         canvas.drawText(label, x, y + fretPaint.getTextSize() / 4.8f, noteText);
 
-        // Hammer-on or Pull-off
-        if (showHammer || showPullOff) {
+        // Palm mute, Hammer-on or Pull-off
+        String marker = null;
+        if (beat.palmMute) marker = "X";
+        else if (showHammer) marker = "H";
+        else if (showPullOff) marker = "P";
+        if (marker != null) {
             Paint hPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             hPaint.setColor(colorSecondary);
             hPaint.setTextSize(fretPaint.getTextSize() / 2f);
             hPaint.setTypeface(Typeface.DEFAULT_BOLD);
             hPaint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText(showHammer ? "H" : "P", x, y - halfH - 10f, hPaint);
+            canvas.drawText(marker, x, y - halfH - 10f, hPaint);
         }
     }
 

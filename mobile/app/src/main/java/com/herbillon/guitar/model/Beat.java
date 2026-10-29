@@ -10,6 +10,7 @@ public class Beat {
     public boolean hammerOn;
     public boolean pullOff;
     public boolean slide;
+    public boolean slideUp;
     public boolean palmMute;
 
     // Partition
