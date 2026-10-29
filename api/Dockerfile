@@ -26,4 +26,11 @@ RUN a2enmod rewrite
 
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
 
+RUN { \
+    echo "upload_max_filesize=20M"; \
+    echo "post_max_size=25M"; \
+    echo "memory_limit=256M"; \
+    echo "max_execution_time=120"; \
+} > /usr/local/etc/php/conf.d/uploads.ini
+
 EXPOSE 80
