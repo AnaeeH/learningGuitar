@@ -6,6 +6,13 @@ services:
       - "5432:5432"
 ###< doctrine/doctrine-bundle ###
 
+  adminer:
+    image: adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - database
+
 ###> symfony/mailer ###
   mailer:
     image: axllent/mailpit
